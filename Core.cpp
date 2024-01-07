@@ -13,20 +13,20 @@ GameObject::GameObject(const std::string_view objectName) : name(objectName), ta
 };
 
 void GameObject::Update() const {
-    for(const auto& e : m_ComponentMap) {
-        e.second->Update();
+    for(const auto& e : m_Components) {
+        e->Update();
     }
 };
 
 void GameObject::Render() const {
-    for(const auto& e : m_ComponentMap) {
-        e.second->Render();
+    for(const auto& e : m_Components) {
+        e->Render();
     }
 };
 
 void GameObject::HandleEvents() const {
-    for(const auto& e : m_ComponentMap) {
-        e.second->HandleEvents();
+    for(const auto& e : m_Components) {
+        e->HandleEvents();
     }
 };
 

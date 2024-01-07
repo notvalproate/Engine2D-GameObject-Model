@@ -5,10 +5,10 @@
 #include <vector>
 #include <string>
 #include <string_view>
-#include <type_traits>
 #include <memory>
-#include <typeindex>
 #include <optional>
+#include <typeinfo>
+#include <algorithm>
 
 class Transform;
 
@@ -69,33 +69,33 @@ public:
     void AddComponent() {
         AssertParametersAreDerived<Last>();
 
-        auto [it, success] = m_ComponentMap.try_emplace(typeid(Last), std::unique_ptr<Last>(new Last(*this)));
-
-        if(success) {
-            m_ComponentMap[typeid(Last)]->Start();
-        }
+        m_Components.push_back(std::unique_ptr<Last>(new Last(*this)));
+        m_Components.back()->Start();
     }
 
     template<typename First, typename Second, typename... Args>
     void AddComponent() {
         AssertParametersAreDerived<First, Second, Args...>();
 
-        auto [it, success] = m_ComponentMap.try_emplace(typeid(First), std::unique_ptr<First>(new First(*this)));
-
-        if(success) {
-            m_ComponentMap[typeid(First)]->Start();
-        }
+        m_Components.push_back(std::unique_ptr<First>(new First(*this)));
+        m_Components.back()->Start();
             
         AddComponent<Second, Args...>();
     }
 
     template<typename T>
     T* GetComponent() const {
-        AssertParametersAreDerived<T>();
+        AssertParametersAreDerived<T>();    
 
-        auto it = m_ComponentMap.find(typeid(T));
+        for(const auto& component : m_Components) {
+            auto ptr = dynamic_cast<T*>(component.get());
+            
+            if(ptr != nullptr) {
+                return ptr;
+            }
+        }
 
-        return (it != m_ComponentMap.end()) ? dynamic_cast<T*>(it->second.get()) : nullptr;
+        return nullptr;
     }
 
     std::string name;
@@ -103,7 +103,7 @@ public:
     Transform transform;
 
 private:
-    std::unordered_map<std::type_index, std::unique_ptr<Component>> m_ComponentMap{};
+    std::vector<std::unique_ptr<Component>> m_Components{};
     static std::vector<const GameObject*> m_GlobalGameObjectsList;
     
     template<typename... Args>

@@ -36,7 +36,7 @@ int main() {
         std::cout << object->tag << std::endl;
     }
 
-    auto counterObject = GameObject::FindObjectByName("Counters");
+    auto counterObject = GameObject::FindObjectByName("Counter");
 
     if(counterObject) {
         std::cout << counterObject.value()->name << std::endl;
