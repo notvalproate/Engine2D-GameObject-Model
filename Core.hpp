@@ -33,3 +33,21 @@ protected:
     friend class GameObject;
 };
 
+
+class Transform final {
+public:
+    uint32_t x{}, y{};
+    double rotation{};
+    uint16_t sx{}, sy{};
+
+private:
+    Transform(GameObject& gameObject);
+
+    std::shared_ptr<Transform> m_Parent;
+    std::vector<std::unique_ptr<Transform>> m_Children;
+
+    GameObject& gameObject;
+
+    friend class GameObject;
+};
+
