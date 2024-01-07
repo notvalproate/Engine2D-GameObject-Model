@@ -16,7 +16,13 @@ $(BUILD_DIR)/%.o: %.cpp | build
 $(BUILD_DIR)/$(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
+ifeq ($(OS),Windows_NT)
+    CLEAN_COMMAND := del /Q /S
+else
+    CLEAN_COMMAND := rm -rf
+endif
+
 clean:
-	del /Q /S $(BUILD_DIR)
+	$(CLEAN_COMMAND) build
 
 .PHONY: all clean
