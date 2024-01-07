@@ -5,7 +5,11 @@ This repository is a mock model created for testing and implementing features fo
 # Build
 
 Simply run make and all the built files will be in the `build` directory.
-```make```
+```
+make
+```
 
 To clean-up the built files:
-```make clean```
+```
+make clean
+```
