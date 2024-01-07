@@ -83,13 +83,18 @@ public:
         AddComponent<Second, Args...>();
     }
 
+    /**
+     * @brief Returns a pointer to the first component of type T attached to this GameObject.
+     * @tparam T The type of component to get.
+     * @return A pointer to the first component of type T. Returns nullptr if Component does not exist.
+     */
     template<typename T>
     T* GetComponent() const {
         AssertParametersAreDerived<T>();    
 
         for(const auto& component : m_Components) {
             auto ptr = dynamic_cast<T*>(component.get());
-            
+
             if(ptr != nullptr) {
                 return ptr;
             }
