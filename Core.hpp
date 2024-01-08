@@ -63,8 +63,8 @@ public:
     void Render() const;
     void HandleEvents() const;
 
-    //static GameObject& FindObjectByName(const std::string_view searchName);
-    //static std::vector<std::reference_wrapper<GameObject>> FindObjectsByTag(const std::string_view searchTag);
+    static std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
+    static GameObject* FindObjectByName(const std::string_view searchName);
 
     template<typename Last>
     void AddComponent() {
@@ -110,7 +110,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
-    //static std::vector<std::reference_wrapper<GameObject>> m_GlobalGameObjectsList;
+    static std::vector<GameObject*> m_GlobalGameObjectsList;
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
