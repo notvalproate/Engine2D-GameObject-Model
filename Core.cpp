@@ -55,3 +55,10 @@ std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view sea
 
     return objects;
 }
+
+void GameObject::operator delete(void *ptr) {
+    auto it = std::find(std::begin(m_GlobalGameObjectsList), std::end(m_GlobalGameObjectsList), ptr);
+    m_GlobalGameObjectsList.erase(it);
+
+    ::delete ptr;
+}

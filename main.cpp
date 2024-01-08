@@ -20,6 +20,7 @@ int main() {
     try {
         GameObject tempCounter("Counter");
         tempCounter.AddComponent<CounterComponent>();
+        tempCounter.tag = "Counter";
 
         for(int i = 0; i < 10; i++) {
             tempCounter.HandleEvents();
@@ -30,18 +31,20 @@ int main() {
         auto tempCountersCountComponent = tempCounter.GetComponent<CounterComponent>();
 
         if(tempCountersCountComponent) {
-            std::cout << tempCountersCountComponent.value()->count << std::endl;
+            std::cout << tempCountersCountComponent->count << std::endl;
         }
+
+        auto counterObject = GameObject::FindObjectByName("Counter");
+
+        std::cout << counterObject->name << std::endl;
+
+        delete counterObject;
 
         auto objects = GameObject::FindObjectsByTag("Counter");
 
         for(const auto& object : objects) {
             std::cout << object->name << std::endl;
         }
-
-        auto counterObject = GameObject::FindObjectByName("Counter");
-
-        std::cout << counterObject->name << std::endl;
 
     }
     catch(const std::exception& e) {
