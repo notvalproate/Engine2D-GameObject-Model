@@ -28,7 +28,9 @@ int main() {
 
     auto tempCountersCountComponent = tempCounter.GetComponent<CounterComponent>();
 
-    std::cout << tempCountersCountComponent->count << std::endl;
+    if(tempCountersCountComponent) {
+        std::cout << tempCountersCountComponent.value()->count << std::endl;
+    }
 
     auto objects = GameObject::FindObjectsByTag("Counter");
 
@@ -37,6 +39,8 @@ int main() {
     }
 
     auto counterObject = GameObject::FindObjectByName("Counter");
+
+    delete counterObject.value();
 
     if(counterObject) {
         std::cout << counterObject.value()->name << std::endl;

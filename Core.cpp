@@ -31,10 +31,10 @@ void GameObject::HandleEvents() const {
 };
 
 // Much rather have this list stored in the scene object as a non-static, to avoid searching through unnecessary objects that arent in the scene
-std::vector<const GameObject*> GameObject::m_GlobalGameObjectsList{};
+std::vector<GameObject*> GameObject::m_GlobalGameObjectsList{};
 
-std::optional<const GameObject*> GameObject::FindObjectByName(const std::string_view searchName) {
-    for(const auto& object : m_GlobalGameObjectsList) {
+std::optional<GameObject*> GameObject::FindObjectByName(const std::string_view searchName) {
+    for(auto& object : m_GlobalGameObjectsList) {
         if(object->name == searchName) {
             return object;
         }
@@ -43,10 +43,10 @@ std::optional<const GameObject*> GameObject::FindObjectByName(const std::string_
     return {};
 }
 
-std::vector<const GameObject*> GameObject::FindObjectsByTag(const std::string_view searchTag) {
-    std::vector<const GameObject*> objects{};
+std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view searchTag) {
+    std::vector<GameObject*> objects{};
 
-    for(const auto& object : m_GlobalGameObjectsList) {
+    for(auto& object : m_GlobalGameObjectsList) {
         if(object->tag == searchTag) {
             objects.push_back(object);
         }

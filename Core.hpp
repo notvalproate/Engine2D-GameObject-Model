@@ -62,8 +62,8 @@ public:
     void Render() const;
     void HandleEvents() const;
 
-    static std::optional<const GameObject*> FindObjectByName(const std::string_view searchName);
-    static std::vector<const GameObject*> FindObjectsByTag(const std::string_view searchTag);
+    static std::optional<GameObject*> FindObjectByName(const std::string_view searchName);
+    static std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
 
     template<typename Last>
     void AddComponent() {
@@ -89,7 +89,7 @@ public:
      * @return A pointer to the first component of type T. Returns nullptr if Component does not exist.
      */
     template<typename T>
-    T* GetComponent() const {
+    std::optional<T*> GetComponent() const {
         AssertParametersAreDerived<T>();    
 
         for(const auto& component : m_Components) {
@@ -109,7 +109,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
-    static std::vector<const GameObject*> m_GlobalGameObjectsList;
+    static std::vector<GameObject*> m_GlobalGameObjectsList;
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
