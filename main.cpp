@@ -32,21 +32,15 @@ int main() {
         std::cout << tempCountersCountComponent.value()->count << std::endl;
     }
 
-    auto objects = GameObject::FindObjectsByTag("Counter");
+    // auto objects = GameObject::FindObjectsByTag("Counter");
 
-    for(const auto& object : objects) {
-        std::cout << object->tag << std::endl;
-    }
+    // for(const auto& object : objects) {
+    //     std::cout << object.get().tag << std::endl;
+    // }
+    
+    // auto counterObject = GameObject::FindObjectByName("Counter");
 
-    auto counterObject = GameObject::FindObjectByName("Counter");
-
-    delete counterObject.value();
-
-    if(counterObject) {
-        std::cout << counterObject.value()->name << std::endl;
-    } else {
-        std::cout << "Could not find object" << std::endl;
-    }
+    // std::cout << counterObject.name << std::endl;
 
     return 0;
 }
