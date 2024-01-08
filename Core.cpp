@@ -10,7 +10,7 @@ GameObject::GameObject() : name({}), tag({}), transform(*this) {
     m_GlobalGameObjectsList.push_back(this);
 };
 
-GameObject::GameObject(const std::string_view objectName) : name(objectName), tag({}), transform(*this) { 
+GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), transform(*this) { 
     m_GlobalGameObjectsList.push_back(this);
 };
 
