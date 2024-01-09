@@ -17,38 +17,32 @@ public:
 };
 
 int main() {
-    try {
-        GameObject tempCounter("Counter");
-        tempCounter.AddComponent<CounterComponent>();
-        tempCounter.tag = "Counter";
+    GameObject tempCounter("Counter");
+    tempCounter.AddComponent<CounterComponent>();
+    tempCounter.tag = "Counter";
 
-        for(int i = 0; i < 10; i++) {
-            tempCounter.HandleEvents();
-            tempCounter.Update();
-            tempCounter.Render();
-        }
-
-        auto tempCountersCountComponent = tempCounter.GetComponent<CounterComponent>();
-
-        if(tempCountersCountComponent) {
-            std::cout << tempCountersCountComponent->count << std::endl;
-        }
-
-        auto counterObject = GameObject::FindObjectByName("Counter");
-
-        std::cout << counterObject->name << std::endl;
-
-        delete counterObject;
-
-        auto objects = GameObject::FindObjectsByTag("Counter");
-
-        for(const auto& object : objects) {
-            std::cout << object->name << std::endl;
-        }
-
+    for(int i = 0; i < 10; i++) {
+        tempCounter.HandleEvents();
+        tempCounter.Update();
+        tempCounter.Render();
     }
-    catch(const std::exception& e) {
-        std::cerr << e.what() << '\n';
+
+    auto tempCountersCountComponent = tempCounter.GetComponent<CounterComponent>();
+
+    if(tempCountersCountComponent) {
+        std::cout << tempCountersCountComponent->count << std::endl;
+    }
+
+    auto counterObject = GameObject::FindObjectByName("Counter");
+
+    std::cout << counterObject->name << std::endl;
+
+    delete counterObject;
+
+    auto objects = GameObject::FindObjectsByTag("Counter");
+
+    for(const auto& object : objects) {
+        std::cout << object->name << std::endl;
     }
 
     return 0;
