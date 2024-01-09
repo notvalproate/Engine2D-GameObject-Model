@@ -38,9 +38,13 @@ private:
 class Vector2D {
 public:
     Vector2D() = default;
-    Vector2D(uint32_t x, uint32_t y) : x(x), y(y) {}
+    Vector2D(uint32_t x, uint32_t y);
 
-    uint32_t x{}, y{};
+    int32_t x{}, y{};
+
+	double GetMagnitude() const;
+    void Normalize();
+	void Scale(const int factor);
 
     static const Vector2D up;
     static const Vector2D down;
@@ -53,11 +57,9 @@ public:
 
 class Transform final {
 public:
-    uint32_t x{}, y{};
+    int32_t x{}, y{};
     double rotation{};
-    uint16_t sx{}, sy{};
-
-    void Translate()
+    int16_t sx{}, sy{};
 
 private:
     Transform(GameObject& gameObject);
