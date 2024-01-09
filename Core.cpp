@@ -1,7 +1,5 @@
 #include "Core.hpp"
 
-#include <exception>
-
 Component::Component(GameObject& gameObject) : gameObject(gameObject), transform(gameObject.transform) { };
 
 Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };

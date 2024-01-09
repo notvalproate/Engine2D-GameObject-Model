@@ -35,12 +35,29 @@ private:
     friend class GameObject;
 };
 
+class Vector2D {
+public:
+    Vector2D() = default;
+    Vector2D(uint32_t x, uint32_t y) : x(x), y(y) {}
+
+    uint32_t x{}, y{};
+
+    static const Vector2D up;
+    static const Vector2D down;
+    static const Vector2D left;
+    static const Vector2D right;
+    static const Vector2D one;
+    static const Vector2D zero;
+};
+
 
 class Transform final {
 public:
     uint32_t x{}, y{};
     double rotation{};
     uint16_t sx{}, sy{};
+
+    void Translate()
 
 private:
     Transform(GameObject& gameObject);
