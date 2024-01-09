@@ -1,8 +1,8 @@
 #include "Core.hpp"
 
-class CounterComponent : public Behavior {
+class CounterComponent : public Behaviour {
 public:
-    using Behavior::Behavior;
+    using Behaviour::Behaviour;
 
     void Start() override {
         std::cout << "Called Counter Start" << std::endl;
@@ -16,16 +16,16 @@ public:
     uint64_t count{};
 };
 
-class CounterDisabler : public Behavior {
+class CounterDisabler : public Behaviour {
 public:
-    using Behavior::Behavior;
+    using Behaviour::Behaviour;
 
     void Start() override {
         m_CounterComponent = gameObject.GetComponent<CounterComponent>();
     }
 
     void Update() override {
-        if(m_CounterComponent->enabled && m_CounterComponent->count == 5) {
+        if(m_CounterComponent->count == 5) {
             m_CounterComponent->enabled = false;
         } 
         
@@ -46,8 +46,7 @@ private:
 
 int main() {
     GameObject tempCounter("Counter");
-    tempCounter.AddComponent<CounterComponent>();
-    tempCounter.AddComponent<CounterDisabler>();
+    tempCounter.AddComponent<CounterComponent, CounterDisabler>();
     tempCounter.tag = "Counter";
 
     for(int i = 0; i < 10; i++) {

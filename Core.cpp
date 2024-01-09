@@ -68,20 +68,35 @@ GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), t
 };
 
 void GameObject::Update() const {
-    for(const auto& e : m_Components) {
-        e->Update();
+    for (const auto& behaviour : m_Behaviours) {
+        if(behaviour->enabled) {
+            behaviour->Update();
+        }
+    }
+    for(const auto& component : m_Components) {
+        component->Update();
     }
 };
 
 void GameObject::Render() const {
-    for(const auto& e : m_Components) {
-        e->Render();
+    for (const auto& behaviour : m_Behaviours) {
+        if(behaviour->enabled) {
+            behaviour->Render();
+        }
+    }
+    for(const auto& component : m_Components) {
+        component->Render();
     }
 };
 
 void GameObject::HandleEvents() const {
-    for(const auto& e : m_Components) {
-        e->HandleEvents();
+    for (const auto& behaviour : m_Behaviours) {
+        if(behaviour->enabled) {
+            behaviour->HandleEvents();
+        }
+    }
+    for(const auto& component : m_Components) {
+        component->HandleEvents();
     }
 };
 

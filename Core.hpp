@@ -35,7 +35,7 @@ private:
     friend class GameObject;
 };
 
-class Behavior : public Component {
+class Behaviour : public Component {
 public:
     using Component::Component;
 
@@ -97,21 +97,23 @@ public:
 
     void operator delete(void *ptr);
 
-    template<typename Last>
+    template<typename T>
     void AddComponent() {
-        AssertParametersAreDerived<Last>();
+        AssertParametersAreDerived<T>();
 
-        m_Components.push_back(std::unique_ptr<Last>(new Last(*this)));
-        m_Components.back()->Start();
+        if constexpr (std::is_base_of<Behaviour, T>::value) {
+            m_Behaviours.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Behaviours.back()->Start();
+        }
+        else {
+            m_Components.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Components.back()->Start();
+        }
     }
 
     template<typename First, typename Second, typename... Args>
     void AddComponent() {
-        AssertParametersAreDerived<First, Second, Args...>();
-
-        m_Components.push_back(std::unique_ptr<First>(new First(*this)));
-        m_Components.back()->Start();
-            
+        AddComponent<First>();
         AddComponent<Second, Args...>();
     }
 
@@ -119,11 +121,22 @@ public:
     T* GetComponent() const {
         AssertParametersAreDerived<T>();    
 
-        for(const auto& component : m_Components) {
-            auto ptr = dynamic_cast<T*>(component.get());
+        if constexpr (std::is_base_of<Behaviour, T>::value) {
+            for(const auto& behaviour : m_Behaviours) {
+                auto ptr = dynamic_cast<T*>(behaviour.get());
 
-            if(ptr != nullptr) {
-                return ptr;
+                if(ptr != nullptr) {
+                    return ptr;
+                }
+            }
+        }
+        else {
+            for(const auto& component : m_Components) {
+                auto ptr = dynamic_cast<T*>(component.get());
+
+                if(ptr != nullptr) {
+                    return ptr;
+                }
             }
         }
 
@@ -136,6 +149,8 @@ public:
     
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
+    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
+    
     static std::vector<GameObject*> m_GlobalGameObjectsList;
     
     template<typename... Args>
