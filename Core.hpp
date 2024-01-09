@@ -25,13 +25,21 @@ public:
     virtual void HandleEvents() {};
 
 protected:
+    Component(GameObject& gameObject);
+
     GameObject& gameObject;
     Transform& transform;
 
 private:
-    Component(GameObject& gameObject);
 
     friend class GameObject;
+};
+
+class Behavior : public Component {
+public:
+    using Component::Component;
+
+    bool enabled{true}, isActiveAndEnabled{true};
 };
 
 

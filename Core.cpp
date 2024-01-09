@@ -99,7 +99,7 @@ GameObject* GameObject::FindObjectByName(const std::string_view searchName) {
 
 std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view searchTag) {
     std::vector<GameObject*> objects{};
-
+    
     for(auto& object : m_GlobalGameObjectsList) {
         if(object->tag == searchTag) {
             objects.push_back(object);
