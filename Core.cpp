@@ -36,8 +36,8 @@ const Vector2D Vector2D::zero(0.0, 0.0);
 Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
 
 void Transform::Translate(const Vector2D& translation) {
-    x += translation.x;
-    y += translation.y;
+    position.x += translation.x;
+    position.y += translation.y;
 }
 
 void Transform::Rotate(const double angle) {
@@ -47,15 +47,15 @@ void Transform::Rotate(const double angle) {
 void Transform::RotateAround(const Vector2D& point, const double angle) {
     const double angleRadians = angle * 180 / M_PI;
 
-    const double relX = x - point.x, relY = y - point.y;
+    const double relX = position.x - point.x, relY = position.y - point.y;
     const double radius = std::sqrt(relX * relX + relY * relY);
 
     const double currentAngleFromPoint = atan2(relY, relX);
 
     const double totalAngle = angleRadians + currentAngleFromPoint;
 
-    x = (cos(totalAngle) * radius) + point.x;
-    y = (sin(totalAngle) * radius) + point.y;
+    position.x = (cos(totalAngle) * radius) + point.x;
+    position.y = (sin(totalAngle) * radius) + point.y;
     rotation += angle;
 }
 

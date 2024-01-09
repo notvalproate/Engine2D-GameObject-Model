@@ -34,6 +34,7 @@ private:
     friend class GameObject;
 };
 
+
 class Vector2D {
 public:
     Vector2D() = default;
@@ -56,9 +57,9 @@ public:
 
 class Transform final {
 public:
-    double x{}, y{};
+    Vector2D position{};
     double rotation{};
-    double scaleX{1}, scaleY{1};
+    Vector2D scale{};
 
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);
@@ -71,6 +72,7 @@ private:
 
     friend class GameObject;
 };
+
 
 class GameObject final {
 public:
