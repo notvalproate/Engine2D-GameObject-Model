@@ -26,10 +26,11 @@ public:
     virtual void HandleEvents() {};
 
 protected:
-    Component(GameObject& gameObject);
-    
     GameObject& gameObject;
     Transform& transform;
+
+private:
+    Component(GameObject& gameObject);
 
     friend class GameObject;
 };
