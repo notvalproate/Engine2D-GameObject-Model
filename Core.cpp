@@ -1,9 +1,11 @@
 #include "Core.hpp"
+
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 Component::Component(GameObject& gameObject) : gameObject(gameObject), transform(gameObject.transform) { };
 
-Vector2D::Vector2D(uint32_t x, uint32_t y) : x(x), y(y) {}
+Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
 double Vector2D::GetMagnitude() const {
     return std::sqrt(x * x + y * y);
@@ -38,12 +40,23 @@ void Transform::Translate(const Vector2D& translation) {
     y += translation.y;
 }
 
-void Transform::Transform::Rotate(const double angle) {
+void Transform::Rotate(const double angle) {
     rotation += angle;
 }
 
 void Transform::RotateAround(const Vector2D& point, const double angle) {
+    const double angleRadians = angle * 180 / M_PI;
 
+    const double relX = x - point.x, relY = y - point.y;
+    const double radius = std::sqrt(relX * relX + relY * relY);
+
+    const double currentAngleFromPoint = atan2(relY, relX);
+
+    const double totalAngle = angleRadians + currentAngleFromPoint;
+
+    x = (cos(totalAngle) * radius) + point.x;
+    y = (sin(totalAngle) * radius) + point.y;
+    rotation += angle;
 }
 
 GameObject::GameObject() : name({}), tag({}), transform(*this) { 

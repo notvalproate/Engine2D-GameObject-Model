@@ -37,9 +37,9 @@ private:
 class Vector2D {
 public:
     Vector2D() = default;
-    Vector2D(uint32_t x, uint32_t y);
+    Vector2D(double x, double y);
 
-    int32_t x{}, y{};
+    double x{}, y{};
 
 	double GetMagnitude() const;
     void Normalize();
@@ -56,9 +56,9 @@ public:
 
 class Transform final {
 public:
-    int32_t x{}, y{};
+    double x{}, y{};
     double rotation{};
-    int16_t scaleX{1}, scaleY{1};
+    double scaleX{1}, scaleY{1};
 
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);
