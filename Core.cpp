@@ -33,6 +33,19 @@ const Vector2D Vector2D::zero(0.0, 0.0);
 
 Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
 
+void Transform::Translate(const Vector2D& translation) {
+    x += translation.x;
+    y += translation.y;
+}
+
+void Transform::Transform::Rotate(const double angle) {
+    rotation += angle;
+}
+
+void Transform::RotateAround(const Vector2D& point, const double angle) {
+
+}
+
 GameObject::GameObject() : name({}), tag({}), transform(*this) { 
     m_GlobalGameObjectsList.push_back(this);
 };
