@@ -183,17 +183,6 @@ void GameObject::Render() const {
     }
 }
 
-void GameObject::HandleEvents() const {
-    for (const auto& behaviour : m_Behaviours) {
-        if(behaviour->enabled) {
-            behaviour->HandleEvents();
-        }
-    }
-    for(const auto& component : m_Components) {
-        component->HandleEvents();
-    }
-}
-
 std::vector<GameObject*> GameObject::m_GlobalGameObjectsList{};
 
 GameObject* GameObject::FindObjectByName(const std::string_view searchName) {

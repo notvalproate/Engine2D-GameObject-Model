@@ -23,7 +23,6 @@ public:
     virtual void Start() {};
     virtual void Update() {};
     virtual void Render() const {};
-    virtual void HandleEvents() {};
 
     bool CompareTag(const std::string_view otherTag) const;
 
@@ -33,7 +32,6 @@ protected:
     GameObject& gameObject;
     Transform& transform;
     std::string& tag;
-private:
 
     friend class GameObject;
 };
@@ -108,7 +106,6 @@ public:
     GameObject(const std::string_view goName);
     ~GameObject() = default;
 
-    void HandleEvents() const;
     void Update() const;
     void Render() const;
 
