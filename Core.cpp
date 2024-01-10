@@ -77,15 +77,44 @@ void Transform::RotateAround(const Vector2D& point, const double angle) {
 
 void Transform::DetachChildren() {
     for(auto& child : m_Children) {
-        child->m_Parent == nullptr;
+        child->m_Parent = nullptr;
     }
 
     m_Children.clear();
+    childCount = 0;
 }
+
+Transform* Transform::Find(const std::string_view name) const {
+    for(const auto& child : m_Children) {
+        if(child->gameObject.name == name) {
+            return child;
+        }
+    }
+
+    return nullptr;
+}
+
+Transform* Transform::GetChild(const std::size_t index) const {
+    if(index >= childCount) {
+        return nullptr;
+    }
+
+    return m_Children[index];
+}
+
+bool Transform::IsChildOf(Transform& parentTransform) const {
+    if(m_Parent == &parentTransform) {
+        return true;
+    }
+
+    return false;
+}
+
 
 void Transform::SetParent(Transform& parentTransform) {
     m_Parent = &parentTransform;
     m_Parent->m_Children.push_back(this);
+    m_Parent->childCount++;
 }
 
 GameObject::GameObject() : name({}), tag({}), transform(*this) { 

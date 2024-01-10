@@ -72,7 +72,7 @@ public:
     double rotation{};
     Vector2D scale{};
 
-    uint16_t childCount;
+    std::size_t childCount{};
 
     GameObject& gameObject;
 
@@ -81,7 +81,11 @@ public:
     void RotateAround(const Vector2D& point, const double angle);
 
     void DetachChildren();
+    Transform* Find(const std::string_view name) const;
+    Transform* GetChild(const std::size_t index) const;
+    bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
+
 private:
     Transform(GameObject& gameObject);
 
