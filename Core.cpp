@@ -40,6 +40,7 @@ const Vector2D Vector2D::zero(0.0, 0.0);
 Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
 
 Transform::~Transform() {
+    DetachFromParent();
     DetachChildren();
 }
 
@@ -89,6 +90,10 @@ void Transform::DetachChildren() {
 }
 
 void Transform::DetachFromParent() {
+    if(!m_Parent) {
+        return;
+    }
+
     auto it = std::find(std::begin(m_Parent->m_Children), std::end(m_Parent->m_Children), this);
     m_Parent->m_Children.erase(it);
 
@@ -106,7 +111,7 @@ Transform* Transform::Find(const std::string_view name) const {
 }
 
 Transform* Transform::GetChild(const std::size_t index) const {
-    if(index >= childCount) {
+    if(index < 0 || index >= childCount) {
         return nullptr;
     }
 
@@ -114,24 +119,40 @@ Transform* Transform::GetChild(const std::size_t index) const {
 }
 
 size_t Transform::GetSiblingIndex() const {
+    if(!m_Parent) {
+        return 0;
+    }
+
     auto it = std::find(std::begin(m_Parent->m_Children), std::end(m_Parent->m_Children), this);
 
     return std::distance(std::begin(m_Parent->m_Children), it);
 }
 
 void Transform::SetAsFirstSibling() const {
+    if(!m_Parent) {
+        return;
+    }
+
     size_t index = GetSiblingIndex();
 
     std::swap(m_Parent->m_Children[index], m_Parent->m_Children.front());
 }
 
 void Transform::SetAsLastSibling() const {
+    if(!m_Parent) {
+        return;
+    }
+
     size_t index = GetSiblingIndex();
 
     std::swap(m_Parent->m_Children[index], m_Parent->m_Children.back());
 }
 
 void Transform::SetSiblingIndex(const std::size_t index) const {
+    if(!m_Parent) {
+        return;
+    }
+
     std::size_t ind = std::clamp(static_cast<std::size_t>(index), static_cast<std::size_t>(0), m_Parent->childCount - 1);
     std::size_t currentIndex = GetSiblingIndex();
 
@@ -145,7 +166,6 @@ bool Transform::IsChildOf(Transform& parentTransform) const {
 
     return false;
 }
-
 
 void Transform::SetParent(Transform& parentTransform) {
     m_Parent = &parentTransform;
