@@ -3,7 +3,11 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-Component::Component(GameObject& gameObject) : gameObject(gameObject), transform(gameObject.transform) { };
+Component::Component(GameObject& gameObject) : gameObject(gameObject), transform(gameObject.transform), tag(gameObject.tag) { };
+
+bool Component::CompareTag(const std::string_view otherTag) const {
+    return tag == otherTag;
+}
 
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
@@ -57,6 +61,11 @@ void Transform::RotateAround(const Vector2D& point, const double angle) {
     position.x = (cos(totalAngle) * radius) + point.x;
     position.y = (sin(totalAngle) * radius) + point.y;
     rotation += angle;
+}
+
+void Transform::SetParent(GameObject& gameObject) {
+    m_Parent = &gameObject.transform;
+    m_Parent->m_Children.push_back(this);
 }
 
 GameObject::GameObject() : name({}), tag({}), transform(*this) { 

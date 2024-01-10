@@ -24,12 +24,14 @@ public:
     virtual void Render() const {};
     virtual void HandleEvents() {};
 
+    bool CompareTag(const std::string_view otherTag) const;
+
 protected:
     Component(GameObject& gameObject);
 
     GameObject& gameObject;
     Transform& transform;
-
+    std::string& tag;
 private:
 
     friend class GameObject;
@@ -69,14 +71,20 @@ public:
     double rotation{};
     Vector2D scale{};
 
+    uint16_t childCount;
+
+    GameObject& gameObject;
+
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);
     void RotateAround(const Vector2D& point, const double angle);
 
+    void SetParent(GameObject& gameObject);
 private:
     Transform(GameObject& gameObject);
 
-    GameObject& gameObject;
+    Transform* m_Parent;
+    std::vector<Transform*> m_Children;
 
     friend class GameObject;
 };
