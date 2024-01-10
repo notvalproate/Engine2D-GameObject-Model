@@ -17,6 +17,8 @@ class GameObject;
 
 class Component {
 public:
+    virtual ~Component() {};
+
     virtual void Awake() {};
     virtual void Start() {};
     virtual void Update() {};
@@ -26,16 +28,17 @@ public:
 
     // IMPLMENTATION REQUIRED FOR COMPONENTS
 protected:
-    Component(GameObject& gameObject);
-
     GameObject& gameObject;
     Transform& transform;
     std::string& tag;
 
 private:
-    virtual ~Component() {};
+    Component(GameObject& gameObject);
+
     friend class GameObject;
+    friend class Behaviour;
 };
+
 
 class Behaviour : public Component {
 public:
@@ -107,7 +110,8 @@ public:
     GameObject(const std::string_view goName);
     ~GameObject() = default;
 
-    void Update() const;
+    void Start();
+    void Update();
     void Render() const;
 
     static std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
@@ -120,12 +124,12 @@ public:
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            m_Behaviours.push_back(std::unique_ptr<T>(new T(*this)));
-            m_Behaviours.back()->Awake();
+            m_Behaviours.push_back(T(*this));
+            m_Behaviours.back().Awake();
         }
         else {
-            m_Components.push_back(std::unique_ptr<T>(new T(*this)));
-            m_Components.back()->Awake();
+            m_Components.push_back(T(*this));
+            m_Components.back().Awake();
         }
     }
 
@@ -141,7 +145,7 @@ public:
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             for(const auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(behaviour.get());
+                auto ptr = dynamic_cast<T*>(&behaviour);
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -150,7 +154,7 @@ public:
         }
         else {
             for(const auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(component.get());
+                auto ptr = dynamic_cast<T*>(&component);
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -166,8 +170,8 @@ public:
     Transform transform;
     
 private:
-    std::vector<std::unique_ptr<Component>> m_Components{};
-    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
+    std::vector<Component> m_Components{};
+    std::vector<Behaviour> m_Behaviours{};
     
     static std::vector<GameObject*> m_GlobalGameObjectsList;
     
