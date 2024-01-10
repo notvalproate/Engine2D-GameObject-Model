@@ -42,10 +42,18 @@ Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
 void Transform::Translate(const Vector2D& translation) {
     position.x += translation.x;
     position.y += translation.y;
+
+    for(auto& child : m_Children) {
+        child->Translate(translation);
+    }
 }
 
 void Transform::Rotate(const double angle) {
     rotation += angle;
+
+    for(auto& child : m_Children) {
+        child->Rotate(angle);
+    }
 }
 
 void Transform::RotateAround(const Vector2D& point, const double angle) {
@@ -61,10 +69,22 @@ void Transform::RotateAround(const Vector2D& point, const double angle) {
     position.x = (cos(totalAngle) * radius) + point.x;
     position.y = (sin(totalAngle) * radius) + point.y;
     rotation += angle;
+
+    for(auto& child : m_Children) {
+        child->RotateAround(point, angle);
+    }
 }
 
-void Transform::SetParent(GameObject& gameObject) {
-    m_Parent = &gameObject.transform;
+void Transform::DetachChildren() {
+    for(auto& child : m_Children) {
+        child->m_Parent == nullptr;
+    }
+
+    m_Children.clear();
+}
+
+void Transform::SetParent(Transform& parentTransform) {
+    m_Parent = &parentTransform;
     m_Parent->m_Children.push_back(this);
 }
 

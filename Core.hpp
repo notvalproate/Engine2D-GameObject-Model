@@ -79,12 +79,13 @@ public:
     void Rotate(const double angle);
     void RotateAround(const Vector2D& point, const double angle);
 
-    void SetParent(GameObject& gameObject);
+    void DetachChildren();
+    void SetParent(Transform& parentTransform);
 private:
     Transform(GameObject& gameObject);
 
-    Transform* m_Parent;
-    std::vector<Transform*> m_Children;
+    Transform* m_Parent{nullptr};
+    std::vector<Transform*> m_Children{};
 
     friend class GameObject;
 };
