@@ -114,19 +114,28 @@ Transform* Transform::GetChild(const std::size_t index) const {
 }
 
 size_t Transform::GetSiblingIndex() const {
+    auto it = std::find(std::begin(m_Parent->m_Children), std::end(m_Parent->m_Children), this);
 
+    return std::distance(std::begin(m_Parent->m_Children), it);
 }
 
 void Transform::SetAsFirstSibling() const {
+    size_t index = GetSiblingIndex();
 
+    std::swap(m_Parent->m_Children[index], m_Parent->m_Children.front());
 }
 
 void Transform::SetAsLastSibling() const {
+    size_t index = GetSiblingIndex();
 
+    std::swap(m_Parent->m_Children[index], m_Parent->m_Children.back());
 }
 
 void Transform::SetSiblingIndex(const std::size_t index) const {
-    
+    std::size_t ind = std::clamp(static_cast<std::size_t>(index), static_cast<std::size_t>(0), m_Parent->childCount - 1);
+    std::size_t currentIndex = GetSiblingIndex();
+
+    std::swap(m_Parent->m_Children[currentIndex], m_Parent->m_Children[ind]);
 }
 
 bool Transform::IsChildOf(Transform& parentTransform) const {
