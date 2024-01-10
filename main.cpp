@@ -16,7 +16,7 @@ int main() {
 
     if(childTransform != nullptr) {
         // delete childTransform; Does not work, since destructor is private and only GameObject is allowed.
-        std::cout << "Found" << std::endl;
+        std::cout << "Found " << childTransform->name << std::endl;
     }
 
     std::cout << std::boolalpha;

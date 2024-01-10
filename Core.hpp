@@ -42,9 +42,13 @@ private:
 
 class Behaviour : public Component {
 public:
-    using Component::Component;
-
     bool enabled{true}, isActiveAndEnabled{true};
+    std::string& name;
+
+protected:
+    Behaviour(GameObject& gameObject);
+
+    friend class GameObject;
 };
 
 
@@ -77,6 +81,9 @@ public:
     std::size_t childCount{};
 
     GameObject& gameObject;
+    
+    std::string& tag;
+    std::string& name;
 
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);

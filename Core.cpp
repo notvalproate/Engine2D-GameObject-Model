@@ -9,6 +9,10 @@ bool Component::CompareTag(const std::string_view otherTag) const {
     return tag == otherTag;
 }
 
+Behaviour::Behaviour(GameObject& gameObject) : Component(gameObject), name(gameObject.name) {
+
+}
+
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
 double Vector2D::GetMagnitude() const {
@@ -37,7 +41,7 @@ const Vector2D Vector2D::right(1.0, 0.0);
 const Vector2D Vector2D::one(1.0, 1.0);
 const Vector2D Vector2D::zero(0.0, 0.0);
 
-Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
+Transform::Transform(GameObject& gameObject) : gameObject(gameObject), tag(gameObject.tag), name(gameObject.name) { };
 
 Transform::~Transform() {
     DetachFromParent();
