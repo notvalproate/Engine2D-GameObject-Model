@@ -25,16 +25,15 @@ public:
     bool CompareTag(const std::string_view otherTag) const;
 
     // IMPLMENTATION REQUIRED FOR COMPONENTS
-
-
 protected:
     Component(GameObject& gameObject);
-    virtual ~Component() {};
 
     GameObject& gameObject;
     Transform& transform;
     std::string& tag;
 
+private:
+    virtual ~Component() {};
     friend class GameObject;
 };
 
