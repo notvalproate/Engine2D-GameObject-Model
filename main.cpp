@@ -23,7 +23,7 @@ int main() {
 
     std::cout << Child.transform.IsChildOf(Parent.transform) << std::endl;
 
-    Parent.transform.DetachChildren();
+    // Parent.transform.DetachChildren();
 
     std::cout << Child.transform.IsChildOf(Parent.transform) << std::endl;
 

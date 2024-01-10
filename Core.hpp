@@ -17,8 +17,6 @@ class GameObject;
 
 class Component {
 public:
-    virtual ~Component() {};
-    
     virtual void Awake() {};
     virtual void Start() {};
     virtual void Update() {};
@@ -26,8 +24,12 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
+    // IMPLMENTATION REQUIRED FOR COMPONENTS
+
+
 protected:
     Component(GameObject& gameObject);
+    virtual ~Component() {};
 
     GameObject& gameObject;
     Transform& transform;
