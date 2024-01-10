@@ -39,6 +39,10 @@ const Vector2D Vector2D::zero(0.0, 0.0);
 
 Transform::Transform(GameObject& gameObject) : gameObject(gameObject) { };
 
+Transform::~Transform() {
+    DetachChildren();
+}
+
 void Transform::Translate(const Vector2D& translation) {
     position.x += translation.x;
     position.y += translation.y;
@@ -84,6 +88,13 @@ void Transform::DetachChildren() {
     childCount = 0;
 }
 
+void Transform::DetachFromParent() {
+    auto it = std::find(std::begin(m_Parent->m_Children), std::end(m_Parent->m_Children), this);
+    m_Parent->m_Children.erase(it);
+
+    m_Parent = nullptr;
+}
+
 Transform* Transform::Find(const std::string_view name) const {
     for(const auto& child : m_Children) {
         if(child->gameObject.name == name) {
@@ -100,6 +111,22 @@ Transform* Transform::GetChild(const std::size_t index) const {
     }
 
     return m_Children[index];
+}
+
+size_t Transform::GetSiblingIndex() const {
+
+}
+
+void Transform::SetAsFirstSibling() const {
+
+}
+
+void Transform::SetAsLastSibling() const {
+
+}
+
+void Transform::SetSiblingIndex(const std::size_t index) const {
+    
 }
 
 bool Transform::IsChildOf(Transform& parentTransform) const {
@@ -119,11 +146,11 @@ void Transform::SetParent(Transform& parentTransform) {
 
 GameObject::GameObject() : name({}), tag({}), transform(*this) { 
     m_GlobalGameObjectsList.push_back(this);
-};
+}
 
 GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), transform(*this) { 
     m_GlobalGameObjectsList.push_back(this);
-};
+}
 
 void GameObject::Update() const {
     for (const auto& behaviour : m_Behaviours) {
@@ -134,7 +161,7 @@ void GameObject::Update() const {
     for(const auto& component : m_Components) {
         component->Update();
     }
-};
+}
 
 void GameObject::Render() const {
     for (const auto& behaviour : m_Behaviours) {
@@ -145,7 +172,7 @@ void GameObject::Render() const {
     for(const auto& component : m_Components) {
         component->Render();
     }
-};
+}
 
 void GameObject::HandleEvents() const {
     for (const auto& behaviour : m_Behaviours) {
@@ -156,7 +183,7 @@ void GameObject::HandleEvents() const {
     for(const auto& component : m_Components) {
         component->HandleEvents();
     }
-};
+}
 
 std::vector<GameObject*> GameObject::m_GlobalGameObjectsList{};
 

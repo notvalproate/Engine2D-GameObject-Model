@@ -81,13 +81,19 @@ public:
     void RotateAround(const Vector2D& point, const double angle);
 
     void DetachChildren();
+    void DetachFromParent();
     Transform* Find(const std::string_view name) const;
     Transform* GetChild(const std::size_t index) const;
+    size_t GetSiblingIndex() const;
+    void SetAsFirstSibling() const;
+    void SetAsLastSibling() const;
+    void SetSiblingIndex(const std::size_t index) const;
     bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
 
 private:
     Transform(GameObject& gameObject);
+    ~Transform();
 
     Transform* m_Parent{nullptr};
     std::vector<Transform*> m_Children{};

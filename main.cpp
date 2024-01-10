@@ -12,6 +12,13 @@ int main() {
 
     Child.transform.SetParent(Parent.transform);
 
+    auto childTransform = Parent.transform.Find("Child");
+
+    if(childTransform != nullptr) {
+        // delete childTransform; Does not work, since destructor is private and only GameObject is allowed.
+        std::cout << "Found" << std::endl;
+    }
+
     std::cout << std::boolalpha;
 
     std::cout << Child.transform.IsChildOf(Parent.transform) << std::endl;
