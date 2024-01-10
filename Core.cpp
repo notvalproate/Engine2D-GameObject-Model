@@ -111,7 +111,7 @@ Transform* Transform::Find(const std::string_view name) const {
 }
 
 Transform* Transform::GetChild(const std::size_t index) const {
-    if(index < 0 || index >= childCount) {
+    if(index >= childCount) {
         return nullptr;
     }
 
@@ -183,32 +183,32 @@ GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), t
 
 void GameObject::Start() {
     for (auto& behaviour : m_Behaviours) {
-        behaviour.Start();
+        behaviour->Start();
     }
     for(auto& component : m_Components) {
-        component.Start();
+        component->Start();
     }
 }
 
 void GameObject::Update() {
     for (auto& behaviour : m_Behaviours) {
-        if(behaviour.enabled) {
-            behaviour.Update();
+        if(behaviour->enabled) {
+            behaviour->Update();
         }
     }
     for(auto& component : m_Components) {
-        component.Update();
+        component->Update();
     }
 }
 
 void GameObject::Render() const {
     for (const auto& behaviour : m_Behaviours) {
-        if(behaviour.enabled) {
-            behaviour.Render();
+        if(behaviour->enabled) {
+            behaviour->Render();
         }
     }
     for(const auto& component : m_Components) {
-        component.Render();
+        component->Render();
     }
 }
 

@@ -124,12 +124,12 @@ public:
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            m_Behaviours.push_back(T(*this));
-            m_Behaviours.back().Awake();
+            m_Behaviours.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Behaviours.back()->Awake();
         }
         else {
-            m_Components.push_back(T(*this));
-            m_Components.back().Awake();
+            m_Components.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Components.back()->Awake();
         }
     }
 
@@ -145,7 +145,7 @@ public:
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             for(const auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(&behaviour);
+                auto ptr = dynamic_cast<T*>(behaviour.get());
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -154,7 +154,7 @@ public:
         }
         else {
             for(const auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(&component);
+                auto ptr = dynamic_cast<T*>(component.get());
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -170,8 +170,8 @@ public:
     Transform transform;
     
 private:
-    std::vector<Component> m_Components{};
-    std::vector<Behaviour> m_Behaviours{};
+    std::vector<std::unique_ptr<Component>> m_Components{};
+    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
     
     static std::vector<GameObject*> m_GlobalGameObjectsList;
     
