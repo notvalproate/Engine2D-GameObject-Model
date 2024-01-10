@@ -19,6 +19,7 @@ class Component {
 public:
     virtual ~Component() {};
     
+    virtual void Awake() {};
     virtual void Start() {};
     virtual void Update() {};
     virtual void Render() const {};
@@ -112,11 +113,11 @@ public:
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             m_Behaviours.push_back(std::unique_ptr<T>(new T(*this)));
-            m_Behaviours.back()->Start();
+            m_Behaviours.back()->Awake();
         }
         else {
             m_Components.push_back(std::unique_ptr<T>(new T(*this)));
-            m_Components.back()->Start();
+            m_Components.back()->Awake();
         }
     }
 
@@ -170,3 +171,4 @@ private:
         );
     }
 };
+
