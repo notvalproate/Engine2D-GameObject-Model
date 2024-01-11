@@ -98,11 +98,11 @@ public:
     bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
 
+    Transform* parent{nullptr};
 private:
     Transform(GameObject& gameObject);
     ~Transform();
-
-    Transform* m_Parent{nullptr};
+    
     std::vector<Transform*> m_Children{};
 
     friend class GameObject;
@@ -203,8 +203,8 @@ public:
 
         T* ptr = GetComponent<T>();
 
-        if(ptr == nullptr && transform.m_Parent) {
-            ptr = transform.m_Parent->gameObject.GetComponentInParent<T>();
+        if(ptr == nullptr && transform.parent) {
+            ptr = transform.parent->gameObject.GetComponentInParent<T>();
         }
 
         return ptr;
@@ -259,8 +259,8 @@ public:
 
         std::vector<T*> components = GetComponents<T>();
 
-        if(transform.m_Parent) {
-            auto componentsInParent = transform.m_Parent->gameObject.GetComponentsInParent<T>();
+        if(transform.parent) {
+            auto componentsInParent = transform.parent->gameObject.GetComponentsInParent<T>();
 
             components.insert(std::end(components), std::begin(componentsInParent), std::end(componentsInParent));
         }
