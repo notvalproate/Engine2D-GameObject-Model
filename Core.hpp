@@ -286,13 +286,3 @@ private:
         );
     }
 };
-
-class Scene {
-public:
-
-
-private:
-    Scene() = default;
-
-    std::vector<std::pair<GameObject, Transform>> m_SceneObjects;
-};
