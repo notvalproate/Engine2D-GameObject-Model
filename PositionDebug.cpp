@@ -1,4 +1,6 @@
+#pragma once
 #include "Core.hpp"
+#include "LocalPositionDebug.cpp"
 
 class PositionDebug : public Behaviour {
 public:
@@ -10,5 +12,11 @@ public:
 
     void Update() override {
         std::cout << name << " " << transform.position.x << std::endl;
+
+        auto childLocalPosDebugger = gameObject.GetComponentInChildren<LocalPositionDebug>();
+
+        if(childLocalPosDebugger) {
+            childLocalPosDebugger->Update();
+        }
     }
 };

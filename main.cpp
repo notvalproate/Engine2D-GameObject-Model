@@ -1,5 +1,6 @@
 #include "Core.hpp"
 #include "PositionDebug.cpp"
+#include "LocalPositionDebug.cpp"
 
 int main() {
     GameObject Parent("Parent");
@@ -7,7 +8,7 @@ int main() {
     Parent.tag = "Parent";
 
     GameObject Child("Child");
-    Child.AddComponent<PositionDebug>();
+    Child.AddComponent<PositionDebug, LocalPositionDebug>();
     Child.tag = "Child";
 
     Child.transform.SetParent(Parent.transform);
@@ -28,18 +29,10 @@ int main() {
     std::cout << Parent.transform.IsChildOf(Child.transform) << std::endl;
 
     Child.transform.Translate(Vector2D(1.0, 1.0));
-    Parent.transform.Translate(Vector2D(1.0, 1.0));
+    Parent.transform.Translate(Vector2D(5.0, 5.0));
 
     Parent.Update();
     Child.Update();
-
-    Child.transform.Translate(Vector2D::one);
-
-    auto childDebugComponent = Parent.GetComponentInChildren<PositionDebug>();
-
-    if(childDebugComponent) {
-        childDebugComponent->Update();
-    }
 
     return 0;
 }
