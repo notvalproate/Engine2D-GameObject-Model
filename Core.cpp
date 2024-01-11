@@ -9,9 +9,7 @@ bool Component::CompareTag(const std::string_view otherTag) const {
     return tag == otherTag;
 }
 
-Behaviour::Behaviour(GameObject& gameObject) : Component(gameObject), name(gameObject.name) {
-
-}
+Behaviour::Behaviour(GameObject& gameObject) : Component(gameObject), name(gameObject.name) { }
 
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 

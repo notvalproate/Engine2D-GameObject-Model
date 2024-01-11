@@ -26,7 +26,37 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
-    // IMPLMENTATION REQUIRED FOR COMPONENTS
+    template<typename T>
+    T* GetComponent() const {
+        return gameObject.GetComponent<T>();
+    }
+
+    template<typename T>
+    T* GetComponentInChildren() const {
+        // Implement in transform
+    }
+
+    template<typename T>
+    T* GetComponentInParent() const {
+        // Implement in transform
+    }
+
+    template<typename T>
+    std::vector<T*> GetComponents() const {
+        // Implement in gameobject
+    }
+
+    template<typename T>
+    std::vector<T*> GetComponentsInChildren() const {
+        // Implement in transform
+    }
+
+    template<typename T>
+    std::vector<T*> GetComponentsInParent() const {
+        // Implement in transform
+    }
+
+
 protected:
     GameObject& gameObject;
     Transform& transform;
@@ -81,7 +111,7 @@ public:
     std::size_t childCount{};
 
     GameObject& gameObject;
-    
+
     std::string& tag;
     std::string& name;
 
