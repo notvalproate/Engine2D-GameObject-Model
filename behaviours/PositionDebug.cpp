@@ -1,5 +1,5 @@
 #pragma once
-#include "Core.hpp"
+#include "../Core.hpp"
 #include "LocalPositionDebug.cpp"
 
 class PositionDebug : public Behaviour {
