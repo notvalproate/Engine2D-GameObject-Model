@@ -183,6 +183,11 @@ GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), t
     m_GlobalGameObjectsList.push_back(this);
 }
 
+GameObject::~GameObject() {
+    auto it = std::find(std::begin(m_GlobalGameObjectsList), std::end(m_GlobalGameObjectsList), this);
+    m_GlobalGameObjectsList.erase(it);
+}
+
 void GameObject::Start() {
     for (auto& behaviour : m_Behaviours) {
         behaviour->Start();

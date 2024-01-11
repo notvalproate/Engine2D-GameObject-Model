@@ -25,7 +25,7 @@ int main() {
 
     // Parent.transform.DetachChildren();
 
-    std::cout << Child.transform.IsChildOf(Parent.transform) << std::endl;
+    std::cout << Parent.transform.IsChildOf(Child.transform) << std::endl;
 
     Child.transform.Translate(Vector2D(1.0, 1.0));
     Parent.transform.Translate(Vector2D(1.0, 1.0));

@@ -26,37 +26,6 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
-    template<typename T>
-    T* GetComponent() const {
-        return gameObject.GetComponent<T>();
-    }
-
-    template<typename T>
-    T* GetComponentInChildren() const {
-        // Implement in transform
-    }
-
-    template<typename T>
-    T* GetComponentInParent() const {
-        // Implement in transform
-    }
-
-    template<typename T>
-    std::vector<T*> GetComponents() const {
-        // Implement in gameobject
-    }
-
-    template<typename T>
-    std::vector<T*> GetComponentsInChildren() const {
-        // Implement in transform
-    }
-
-    template<typename T>
-    std::vector<T*> GetComponentsInParent() const {
-        // Implement in transform
-    }
-
-
 protected:
     GameObject& gameObject;
     Transform& transform;
@@ -102,6 +71,7 @@ public:
 };
 
 
+
 class Transform final {
 public:
     Vector2D position{};
@@ -130,6 +100,78 @@ public:
     bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
 
+    // GETTING COMPONENTS
+
+    // template<typename T>
+    // T* GetComponent() const {
+    //     return gameObject.GetComponent<T>();
+    // }
+
+    // template<typename T>
+    // T* GetComponentInChildren() const {
+    //     AssertParametersAreDerived<T>();
+
+    //     T* ptr = gameObject.GetComponent<T>();
+
+    //     if(ptr == nullptr) {
+    //         for(auto& childTransform : m_Children) {
+    //             ptr = childTransform->GetComponentInChildren<T>();
+
+    //             if(ptr != nullptr) {
+    //                 break;
+    //             }
+    //         }
+    //     }
+
+    //     return ptr;
+    // }
+
+    // template<typename T>
+    // T* GetComponentInParent() const {
+    //     AssertParametersAreDerived<T>();
+
+    //     T* ptr = gameObject.GetComponent<T>();
+
+    //     if(ptr == nullptr && m_Parent) {
+    //         ptr = m_Parent->GetComponentInParent<T>();
+    //     }
+
+    //     return ptr;
+    // }
+
+    // template<typename T>
+    // std::vector<T*> GetComponents() const {
+    //     return gameObject.GetComponents<T>();
+    // }
+
+    // template<typename T>
+    // std::vector<T*> GetComponentsInChildren() const {
+    //     AssertParametersAreDerived<T>();
+
+    //     std::vector<T*> components = GetComponents<T>();
+
+    //     for(auto& childTransform : m_Children) {
+    //         auto componentsInChildren = childTransform->GetComponentsInChildren<T>();
+
+    //         components.insert(std::end(components), std::begin(componentsInChildren), std::end(componentsInChildren));
+    //     }
+    // }
+
+    // template<typename T>
+    // std::vector<T*> GetComponentsInParent() const {
+    //     AssertParametersAreDerived<T>();
+
+    //     std::vector<T*> components = GetComponents<T>();
+
+    //     if(m_Parent) {
+    //         auto componentsInParent = m_Parent->GetComponentsInParent<T>();
+
+    //         components.insert(std::end(components), std::begin(componentsInParent), std::end(componentsInParent));
+    //     }
+
+    //     return components;
+    // }
+
 private:
     Transform(GameObject& gameObject);
     ~Transform();
@@ -138,6 +180,14 @@ private:
     std::vector<Transform*> m_Children{};
 
     friend class GameObject;
+
+    template<typename... Args>
+    static void AssertParametersAreDerived() {
+        static_assert(
+            std::conjunction<std::is_base_of<Component, Args>...>::value, 
+            "Custom Component provided not derived from Component Class"
+        );
+    }
 };
 
 
@@ -145,7 +195,7 @@ class GameObject final {
 public:
     GameObject();
     GameObject(const std::string_view goName);
-    ~GameObject() = default;
+    ~GameObject();
 
     void Start();
     void Update();
@@ -202,6 +252,34 @@ public:
         return nullptr;
     }
 
+    template<typename T>
+    std::vector<T*> GetComponents() const {
+        AssertParametersAreDerived<T>();
+
+        std::vector<T*> components{};
+
+        if constexpr (std::is_base_of<Behaviour, T>::value) {
+            for(const auto& behaviour : m_Behaviours) {
+                auto ptr = dynamic_cast<T*>(behaviour.get());
+
+                if(ptr != nullptr) {
+                    components.push_back(ptr);
+                }
+            }
+        }
+        else {
+            for(const auto& component : m_Components) {
+                auto ptr = dynamic_cast<T*>(component.get());
+
+                if(ptr != nullptr) {
+                    components.push_back(ptr);
+                }
+            }
+        }
+
+        return components;
+    }
+
     std::string name;
     std::string tag;
     Transform transform;
@@ -220,4 +298,3 @@ private:
         );
     }
 };
-

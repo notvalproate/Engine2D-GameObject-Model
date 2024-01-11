@@ -9,6 +9,6 @@ public:
     }
 
     void Update() override {
-        std::cout << tag << " " << transform.position.x << std::endl;
+        std::cout << name << " " << transform.position.x << std::endl;
     }
 };
