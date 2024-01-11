@@ -14,7 +14,7 @@ int main() {
 
     auto childTransform = Parent.transform.Find("Child");
 
-    if(childTransform != nullptr) {
+    if(childTransform) {
         // delete childTransform; Does not work, since destructor is private and only GameObject is allowed.
         std::cout << "Found " << childTransform->name << std::endl;
     }
@@ -32,6 +32,14 @@ int main() {
 
     Parent.Update();
     Child.Update();
+
+    Child.transform.Translate(Vector2D::one);
+
+    auto childDebugComponent = Parent.GetComponentInChildren<PositionDebug>();
+
+    if(childDebugComponent) {
+        childDebugComponent->Update();
+    }
 
     return 0;
 }

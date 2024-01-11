@@ -70,8 +70,6 @@ public:
     static const Vector2D zero;
 };
 
-
-
 class Transform final {
 public:
     Vector2D position{};
@@ -99,78 +97,6 @@ public:
     void SetSiblingIndex(const std::size_t index) const;
     bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
-
-    // GETTING COMPONENTS
-
-    // template<typename T>
-    // T* GetComponent() const {
-    //     return gameObject.GetComponent<T>();
-    // }
-
-    // template<typename T>
-    // T* GetComponentInChildren() const {
-    //     AssertParametersAreDerived<T>();
-
-    //     T* ptr = gameObject.GetComponent<T>();
-
-    //     if(ptr == nullptr) {
-    //         for(auto& childTransform : m_Children) {
-    //             ptr = childTransform->GetComponentInChildren<T>();
-
-    //             if(ptr != nullptr) {
-    //                 break;
-    //             }
-    //         }
-    //     }
-
-    //     return ptr;
-    // }
-
-    // template<typename T>
-    // T* GetComponentInParent() const {
-    //     AssertParametersAreDerived<T>();
-
-    //     T* ptr = gameObject.GetComponent<T>();
-
-    //     if(ptr == nullptr && m_Parent) {
-    //         ptr = m_Parent->GetComponentInParent<T>();
-    //     }
-
-    //     return ptr;
-    // }
-
-    // template<typename T>
-    // std::vector<T*> GetComponents() const {
-    //     return gameObject.GetComponents<T>();
-    // }
-
-    // template<typename T>
-    // std::vector<T*> GetComponentsInChildren() const {
-    //     AssertParametersAreDerived<T>();
-
-    //     std::vector<T*> components = GetComponents<T>();
-
-    //     for(auto& childTransform : m_Children) {
-    //         auto componentsInChildren = childTransform->GetComponentsInChildren<T>();
-
-    //         components.insert(std::end(components), std::begin(componentsInChildren), std::end(componentsInChildren));
-    //     }
-    // }
-
-    // template<typename T>
-    // std::vector<T*> GetComponentsInParent() const {
-    //     AssertParametersAreDerived<T>();
-
-    //     std::vector<T*> components = GetComponents<T>();
-
-    //     if(m_Parent) {
-    //         auto componentsInParent = m_Parent->GetComponentsInParent<T>();
-
-    //         components.insert(std::end(components), std::begin(componentsInParent), std::end(componentsInParent));
-    //     }
-
-    //     return components;
-    // }
 
 private:
     Transform(GameObject& gameObject);
@@ -253,6 +179,38 @@ public:
     }
 
     template<typename T>
+    T* GetComponentInChildren() const {
+        AssertParametersAreDerived<T>();
+
+        T* ptr = GetComponent<T>();
+
+        if(ptr == nullptr) {
+            for(auto& childTransform : transform.m_Children) {
+                ptr = childTransform->gameObject.GetComponentInChildren<T>();
+
+                if(ptr != nullptr) {
+                    break;
+                }
+            }
+        }
+
+        return ptr;
+    }
+
+    template<typename T>
+    T* GetComponentInParent() const {
+        AssertParametersAreDerived<T>();
+
+        T* ptr = GetComponent<T>();
+
+        if(ptr == nullptr && transform.m_Parent) {
+            ptr = transform.m_Parent->gameObject.GetComponentInParent<T>();
+        }
+
+        return ptr;
+    }
+
+    template<typename T>
     std::vector<T*> GetComponents() const {
         AssertParametersAreDerived<T>();
 
@@ -280,6 +238,36 @@ public:
         return components;
     }
 
+    template<typename T>
+    std::vector<T*> GetComponentsInChildren() const {
+        AssertParametersAreDerived<T>();
+
+        std::vector<T*> components = GetComponents<T>();
+
+        for(auto& childTransform : transform.m_Children) {
+            auto componentsInChildren = childTransform->gameObject.GetComponentsInChildren<T>();
+
+            components.insert(std::end(components), std::begin(componentsInChildren), std::end(componentsInChildren));
+        }
+
+        return components;
+    }
+
+    template<typename T>
+    std::vector<T*> GetComponentsInParent() const {
+        AssertParametersAreDerived<T>();
+
+        std::vector<T*> components = GetComponents<T>();
+
+        if(transform.m_Parent) {
+            auto componentsInParent = transform.m_Parent->gameObject.GetComponentsInParent<T>();
+
+            components.insert(std::end(components), std::begin(componentsInParent), std::end(componentsInParent));
+        }
+
+        return components;
+    }
+
     std::string name;
     std::string tag;
     Transform transform;
@@ -297,4 +285,14 @@ private:
             "Custom Component provided not derived from Component Class"
         );
     }
+};
+
+class Scene {
+public:
+
+
+private:
+    Scene() = default;
+
+    std::vector<std::pair<GameObject, Transform>> m_SceneObjects;
 };
