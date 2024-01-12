@@ -2,22 +2,30 @@
 #include "behaviours/PositionDebug.cpp"
 #include "behaviours/LocalPositionDebug.cpp"
 
-class MyScene : public Scene {
-public:
-    void Setup() override {
-        GameObject Player("Player");
-        Player.AddComponent<Player, PlayerController>();
-        Player.tag = "Player";
+// class MyScene : public Scene {
+// public:
+//     void Setup() override {
+//         GameObject Player("Player");
+//         Player.AddComponent<Player, PlayerController>();
+//         Player.tag = "Player";
 
-        GameObject Sword("Sword");
-        Sword.AddComponent<Weapon>();
-        Sword.transform.SetParent(Player.transform);
+//         GameObject Sword("Sword");
+//         Sword.AddComponent<Weapon>();
+//         Sword.transform.SetParent(Player.transform);
 
-        AddGameObject(Player);
-    }
-}
+//         AddGameObject(Player);
+//     }
+// }
 
 int main() {
+    // MyScene scene;
+
+    // scene.setup();
+
+    // for(int i = 0; i < 10; i++) {
+    //     scene.Update();
+    //     scene.Render();
+    // }
     GameObject Parent("Parent");
     Parent.AddComponent<PositionDebug>();
     Parent.tag = "Parent";
