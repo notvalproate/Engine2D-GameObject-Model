@@ -17,6 +17,7 @@ class GameObject;
 
 class Component {
 public:
+    Component(std::shared_ptr<GameObject> gameObject);
     virtual ~Component() {};
 
     virtual void Awake() {};
@@ -26,28 +27,18 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
-protected:
-    GameObject& gameObject;
-    Transform& transform;
-    std::string& tag;
-
-private:
-    Component(GameObject& gameObject);
-
-    friend class GameObject;
-    friend class Behaviour;
+    std::shared_ptr<GameObject> gameObject;
+    std::shared_ptr<Transform> transform;
+    std::shared_ptr<std::string> tag;
 };
 
 
 class Behaviour : public Component {
 public:
+    Behaviour(std::shared_ptr<GameObject> gameObject);
+
     bool enabled{true}, isActiveAndEnabled{true};
-    std::string& name;
-
-protected:
-    Behaviour(GameObject& gameObject);
-
-    friend class GameObject;
+    std::shared_ptr<std::string> name;
 };
 
 
@@ -72,16 +63,21 @@ public:
 
 class Transform final {
 public:
+    Transform(std::shared_ptr<GameObject> gameObject);
+    ~Transform();
+
     Vector2D position{};
     double rotation{};
     Vector2D scale{};
 
+    std::shared_ptr<GameObject> gameObject;
+
+    std::shared_ptr<Transform> parent;
+    std::vector<std::shared_ptr<Transform>> m_Children{};
     std::size_t childCount{};
 
-    GameObject& gameObject;
-
-    std::string& tag;
-    std::string& name;
+    std::shared_ptr<std::string> tag;
+    std::shared_ptr<std::string> name;
 
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);
@@ -97,23 +93,6 @@ public:
     void SetSiblingIndex(const std::size_t index) const;
     bool IsChildOf(Transform& parentTransform) const;
     void SetParent(Transform& parentTransform);
-
-    Transform* parent{nullptr};
-private:
-    Transform(GameObject& gameObject);
-    ~Transform();
-    
-    std::vector<Transform*> m_Children{};
-
-    friend class GameObject;
-
-    template<typename... Args>
-    static void AssertParametersAreDerived() {
-        static_assert(
-            std::conjunction<std::is_base_of<Component, Args>...>::value, 
-            "Custom Component provided not derived from Component Class"
-        );
-    }
 };
 
 class Scene;
@@ -267,9 +246,9 @@ public:
         return components;
     }
 
-    std::string name;
-    std::string tag;
-    Transform transform;
+    std::shared_ptr<std::string> name;
+    std::shared_ptr<std::string> tag;
+    std::shared_ptr<Transform> transform;
     Scene& scene;
     
 private:

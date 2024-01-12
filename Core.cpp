@@ -3,13 +3,13 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-Component::Component(GameObject& gameObject) : gameObject(gameObject), transform(gameObject.transform), tag(gameObject.tag) { };
+Component::Component(std::shared_ptr<GameObject> gameObject) : gameObject(gameObject), transform(gameObject.get()->transform), tag(gameObject.get()->tag) { };
 
 bool Component::CompareTag(const std::string_view otherTag) const {
-    return tag == otherTag;
+    return *tag.get() == otherTag;
 }
 
-Behaviour::Behaviour(GameObject& gameObject) : Component(gameObject), name(gameObject.name) { }
+Behaviour::Behaviour(std::shared_ptr<GameObject> gameObject) : Component(gameObject), name(gameObject.get()->name) { }
 
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
@@ -39,7 +39,7 @@ const Vector2D Vector2D::right(1.0, 0.0);
 const Vector2D Vector2D::one(1.0, 1.0);
 const Vector2D Vector2D::zero(0.0, 0.0);
 
-Transform::Transform(GameObject& gameObject) : gameObject(gameObject), tag(gameObject.tag), name(gameObject.name) { };
+Transform::Transform(std::shared_ptr<GameObject> gameObject) : gameObject(gameObject), tag(gameObject.get()->tag), name(gameObject.get()->name) { };
 
 Transform::~Transform() {
     DetachFromParent();
@@ -84,7 +84,7 @@ void Transform::RotateAround(const Vector2D& point, const double angle) {
 
 void Transform::DetachChildren() {
     for(auto& child : m_Children) {
-        child->parent = nullptr;
+        child.get()->parent = nullptr;
     }
 
     m_Children.clear();
@@ -92,20 +92,20 @@ void Transform::DetachChildren() {
 }
 
 void Transform::DetachFromParent() {
-    if(!parent) {
+    if(!parent.get()) {
         return;
     }
 
-    auto it = std::find(std::begin(parent->m_Children), std::end(parent->m_Children), this);
-    parent->m_Children.erase(it);
+    auto it = std::find(std::begin(parent.get()->m_Children), std::end(parent.get()->m_Children), this);
+    parent.get()->m_Children.erase(it);
 
-    parent = nullptr;
+    parent.reset();
 }
 
 Transform* Transform::Find(const std::string_view name) const {
     for(const auto& child : m_Children) {
-        if(child->gameObject.name == name) {
-            return child;
+        if(*child.get()->gameObject.get()->name.get() == name) {
+            return child.get();
         }
     }
 
@@ -117,7 +117,7 @@ Transform* Transform::GetChild(const std::size_t index) const {
         return nullptr;
     }
 
-    return m_Children[index];
+    return m_Children[index].get();
 }
 
 size_t Transform::GetSiblingIndex() const {

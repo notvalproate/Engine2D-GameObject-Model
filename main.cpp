@@ -1,6 +1,6 @@
 #include "Core.hpp"
-#include "behaviours/PositionDebug.cpp"
-#include "behaviours/LocalPositionDebug.cpp"
+// #include "behaviours/PositionDebug.cpp"
+// #include "behaviours/LocalPositionDebug.cpp"
 
 // class MyScene : public Scene {
 // public:
