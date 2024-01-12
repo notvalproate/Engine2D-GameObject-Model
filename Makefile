@@ -1,5 +1,5 @@
 CXX := g++
-CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic
+CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -O3
 BUILD_DIR := build
 TARGET := main
 SRCS := Core.cpp main.cpp
