@@ -2,6 +2,21 @@
 #include "PositionDebug.cpp"
 #include "LocalPositionDebug.cpp"
 
+class MyScene : public Scene {
+public:
+    void Setup() override {
+        GameObject Player("Player");
+        Player.AddComponent<Player, PlayerController>();
+        Player.tag = "Player";
+
+        GameObject Sword("Sword");
+        Sword.AddComponent<Weapon>();
+        Sword.transform.SetParent(Player.transform);
+
+        AddGameObject(Player);
+    }
+}
+
 int main() {
     GameObject Parent("Parent");
     Parent.AddComponent<PositionDebug>();
