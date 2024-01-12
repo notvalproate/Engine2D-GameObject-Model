@@ -175,11 +175,11 @@ void Transform::SetParent(Transform& parentTransform) {
     parent->childCount++;
 }
 
-GameObject::GameObject() : name({}), tag({}), transform(*this) { 
+GameObject::GameObject(Scene& scene) : name({}), tag({}), transform(*this), scene(scene) { 
     m_GlobalGameObjectsList.push_back(this);
 }
 
-GameObject::GameObject(const std::string_view goName) : name(goName), tag({}), transform(*this) { 
+GameObject::GameObject(const std::string_view goName, Scene& scene) : name(goName), tag({}), transform(*this), scene(scene) { 
     m_GlobalGameObjectsList.push_back(this);
 }
 
@@ -243,9 +243,32 @@ std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view sea
     return objects;
 }
 
-void GameObject::operator delete(void *ptr) {
-    auto it = std::find(std::begin(m_GlobalGameObjectsList), std::end(m_GlobalGameObjectsList), ptr);
-    m_GlobalGameObjectsList.erase(it);
+GameObject& Scene::CreateGameObject() {
+    m_SceneGameObjects.push_back(GameObject(*this));
+    return m_SceneGameObjects.back();
+}
 
-    ::delete ptr;
+GameObject& Scene::CreateGameObject(const std::string_view goName) {
+    m_SceneGameObjects.push_back(GameObject(goName, *this));
+    return m_SceneGameObjects.back();
+}
+
+void Scene::Start() {
+    // SetupScene();
+
+    // for(auto& gameObject : m_SceneGameObjects) {
+    //     gameObject.Start();
+    // }
+}
+
+void Scene::Update() {
+    // for(auto& gameObject : m_SceneGameObjects) {
+    //     gameObject.Update();
+    // }
+}
+
+void Scene::Render() const {
+    // for(auto& gameObject : m_SceneGameObjects) {
+    //     gameObject.Render();
+    // }
 }

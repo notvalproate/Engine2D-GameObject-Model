@@ -116,21 +116,20 @@ private:
     }
 };
 
+class Scene;
 
 class GameObject final {
 public:
-    GameObject();
-    GameObject(const std::string_view goName);
+    GameObject(Scene& scene);
+    GameObject(const std::string_view goName, Scene& scene);
     ~GameObject();
-
+    
     void Start();
     void Update();
     void Render() const;
 
     static std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
     static GameObject* FindObjectByName(const std::string_view searchName);
-
-    void operator delete(void *ptr);
 
     template<typename T>
     void AddComponent() {
@@ -271,6 +270,7 @@ public:
     std::string name;
     std::string tag;
     Transform transform;
+    Scene& scene;
     
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
@@ -285,4 +285,20 @@ private:
             "Custom Component provided not derived from Component Class"
         );
     }
+
+    friend class Scene;
+};
+
+class Scene {
+public:
+    virtual void SetupScene() = 0;
+
+    void Start();
+    void Update();
+    void Render() const;
+
+    GameObject& CreateGameObject();
+    GameObject& CreateGameObject(const std::string_view goName);
+private:
+    std::vector<GameObject> m_SceneGameObjects{};   
 };
