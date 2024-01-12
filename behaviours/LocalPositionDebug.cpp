@@ -6,6 +6,6 @@ public:
     using Behaviour::Behaviour;
 
     void Update() {
-        std::cout << transform.position.x - gameObject.transform.parent->position.x << std::endl;
+        std::cout << *name << " " << transform->position.x - gameObject->transform.parent->position.x << std::endl;
     }
 };

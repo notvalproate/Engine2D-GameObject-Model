@@ -1,41 +1,52 @@
 #include "Core.hpp"
-// #include "behaviours/PositionDebug.cpp"
-// #include "behaviours/LocalPositionDebug.cpp"
+#include "behaviours/PositionDebug.cpp"
+#include "behaviours/LocalPositionDebug.cpp"
 
-// class MyScene : public Scene {
-// public:
-//     void SetupScene() override {
-//         auto Parent = CreateGameObject("Parent");
-//         Parent->AddComponent<PositionDebug>();
-//         Parent->tag = "Parent";
+class MyScene : public Scene {
+public:
+    using Scene::Scene;
 
-//         auto Child = CreateGameObject("Child");
-//         Child->AddComponent<PositionDebug, LocalPositionDebug>();
-//         Child->tag = "Child";
+    void SetupScene() override {
+        std::cout << "Setup Started" << std::endl;
 
-//         Child->transform.SetParent(Parent->transform);
+        auto Parent = CreateGameObject("Parent");
+        Parent->AddComponent<PositionDebug>();
+        Parent->tag = "Parent";
 
-//         auto childTransform = Parent->transform.Find("Child");
+        auto Child = CreateGameObject("Child");
+        Child->AddComponent<PositionDebug, LocalPositionDebug>();
+        Child->tag = "Child";
 
-//         if(childTransform) {
-//             // delete childTransform; Does not work, since destructor is private and only GameObject is allowed.
-//             std::cout << "Found " << childTransform->name << std::endl;
-//         }
+        Child->transform.SetParent(&Parent->transform);
 
-//         std::cout << std::boolalpha;
+        auto childTransform = Parent->transform.Find("Child");
 
-//         std::cout << Child->transform.IsChildOf(Parent->transform) << std::endl;
+        if(childTransform) {
+            std::cout << "Found " << childTransform->name << std::endl;
+        }
 
-//         // Parent.transform.DetachChildren();
+        std::cout << std::boolalpha;
 
-//         std::cout << Parent->transform.IsChildOf(Child->transform) << std::endl;
+        std::cout << Child->transform.IsChildOf(&Parent->transform) << std::endl;
 
-//         Child->transform.Translate(Vector2D(1.0, 1.0));
-//         Parent->transform.Translate(Vector2D(5.0, 5.0));
-//     }
-// };
+        // Parent.transform.DetachChildren();
+
+        std::cout << Parent->transform.IsChildOf(&Child->transform) << std::endl;
+
+        Child->transform.Translate(Vector2D(1.0, 1.0));
+        Parent->transform.Translate(Vector2D(5.0, 5.0));
+
+        std::cout << "Setup Complete" << std::endl;
+    }
+};
 
 int main() {
+    MyScene testScene("Test");
+
+    testScene.SetupScene();
+
+    testScene.Start();
+    testScene.Update();
 
     return 0;
 }

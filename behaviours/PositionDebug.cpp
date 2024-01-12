@@ -11,9 +11,9 @@ public:
     }
 
     void Update() override {
-        std::cout << name << " " << transform.position.x << std::endl;
+        std::cout << *name << " " << transform->position.x << std::endl;
 
-        auto childLocalPosDebugger = gameObject.GetComponentInChildren<LocalPositionDebug>();
+        auto childLocalPosDebugger = gameObject->GetComponentInChildren<LocalPositionDebug>();
 
         if(childLocalPosDebugger) {
             childLocalPosDebugger->Update();

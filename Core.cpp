@@ -3,13 +3,39 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
-Component::Component(std::shared_ptr<GameObject> gameObject) : gameObject(gameObject), transform(gameObject.get()->transform), tag(gameObject.get()->tag) { };
+Component::Component(GameObject* gameObject) : gameObject(gameObject), transform(&gameObject->transform), tag(&gameObject->tag) { }
+
+// Component::Component(const Component& other) {
+//     *this = other;
+// }
+
+// Component& Component::operator=(const Component& other) {
+//     gameObject = other.gameObject;
+//     transform = other.transform;
+//     tag = other.tag;
+
+//     return *this;
+// }
+
+// Component::Component(const Component&& other) noexcept {
+//     *this = std::move(other);
+// }
+
+// Component& Component::operator=(const Component&& other) noexcept {
+//     gameObject = other.gameObject;
+//     transform = other.transform;
+//     tag = other.tag;
+
+//     return *this;
+// }
+
+Component::~Component() { }
 
 bool Component::CompareTag(const std::string_view otherTag) const {
-    return *tag.get() == otherTag;
+    return *tag == otherTag;
 }
 
-Behaviour::Behaviour(std::shared_ptr<GameObject> gameObject) : Component(gameObject), name(gameObject.get()->name) { }
+Behaviour::Behaviour(GameObject* gameObject) : Component(gameObject), enabled(true), isActiveAndEnabled(true), name(&gameObject->name) { }
 
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
@@ -39,7 +65,7 @@ const Vector2D Vector2D::right(1.0, 0.0);
 const Vector2D Vector2D::one(1.0, 1.0);
 const Vector2D Vector2D::zero(0.0, 0.0);
 
-Transform::Transform(std::shared_ptr<GameObject> gameObject) : gameObject(gameObject), tag(gameObject.get()->tag), name(gameObject.get()->name) { };
+Transform::Transform(GameObject* gameObject) : gameObject(gameObject), parent(nullptr), tag(&gameObject->tag), name(&gameObject->name) { };
 
 Transform::~Transform() {
     DetachFromParent();
@@ -84,7 +110,7 @@ void Transform::RotateAround(const Vector2D& point, const double angle) {
 
 void Transform::DetachChildren() {
     for(auto& child : m_Children) {
-        child.get()->parent = nullptr;
+        child->parent = nullptr;
     }
 
     m_Children.clear();
@@ -92,20 +118,20 @@ void Transform::DetachChildren() {
 }
 
 void Transform::DetachFromParent() {
-    if(!parent.get()) {
+    if(!parent) {
         return;
     }
 
-    auto it = std::find(std::begin(parent.get()->m_Children), std::end(parent.get()->m_Children), this);
-    parent.get()->m_Children.erase(it);
+    auto it = std::find(std::begin(parent->m_Children), std::end(parent->m_Children), this);
+    parent->m_Children.erase(it);
 
-    parent.reset();
+    parent = nullptr;
 }
 
-Transform* Transform::Find(const std::string_view name) const {
+Transform* Transform::Find(const std::string_view searchName) const {
     for(const auto& child : m_Children) {
-        if(*child.get()->gameObject.get()->name.get() == name) {
-            return child.get();
+        if(*name == searchName) {
+            return child;
         }
     }
 
@@ -117,7 +143,7 @@ Transform* Transform::GetChild(const std::size_t index) const {
         return nullptr;
     }
 
-    return m_Children[index].get();
+    return m_Children[index];
 }
 
 size_t Transform::GetSiblingIndex() const {
@@ -135,7 +161,7 @@ void Transform::SetAsFirstSibling() const {
         return;
     }
 
-    size_t index = GetSiblingIndex();
+    std::size_t index = GetSiblingIndex();
 
     std::swap(parent->m_Children[index], parent->m_Children.front());
 }
@@ -161,32 +187,27 @@ void Transform::SetSiblingIndex(const std::size_t index) const {
     std::swap(parent->m_Children[currentIndex], parent->m_Children[ind]);
 }
 
-bool Transform::IsChildOf(Transform& parentTransform) const {
-    if(parent == &parentTransform) {
+bool Transform::IsChildOf(Transform* parentTransform) const {
+    if(parent == parentTransform) {
         return true;
     }
 
     return false;
 }
 
-void Transform::SetParent(Transform& parentTransform) {
-    parent = &parentTransform;
+void Transform::SetParent(Transform* parentTransform) {
+    DetachFromParent();
+
+    parent = parentTransform;
     parent->m_Children.push_back(this);
     parent->childCount++;
 }
 
-GameObject::GameObject(Scene& scene) : name({}), tag({}), transform(*this), scene(scene) { 
-    m_GlobalGameObjectsList.push_back(this);
-}
+GameObject::GameObject(Scene* scene) : name({}), tag({}), transform(this), scene(scene) { }
 
-GameObject::GameObject(const std::string_view goName, Scene& scene) : name(goName), tag({}), transform(*this), scene(scene) { 
-    m_GlobalGameObjectsList.push_back(this);
-}
+GameObject::GameObject(const std::string_view goName, Scene* scene) : name(goName), tag({}), transform(this), scene(scene) { }
 
-GameObject::~GameObject() {
-    auto it = std::find(std::begin(m_GlobalGameObjectsList), std::end(m_GlobalGameObjectsList), this);
-    m_GlobalGameObjectsList.erase(it);
-}
+GameObject::~GameObject() { }
 
 void GameObject::Start() {
     for (auto& behaviour : m_Behaviours) {
@@ -219,39 +240,9 @@ void GameObject::Render() const {
     }
 }
 
-std::vector<GameObject*> GameObject::m_GlobalGameObjectsList{};
+Scene::Scene() { }
 
-GameObject* GameObject::FindObjectByName(const std::string_view searchName) {
-    for(auto& object : m_GlobalGameObjectsList) {
-        if(object->name == searchName) {
-            return object;
-        }
-    }
-
-    return nullptr;
-}
-
-std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view searchTag) {
-    std::vector<GameObject*> objects{};
-    
-    for(auto& object : m_GlobalGameObjectsList) {
-        if(object->tag == searchTag) {
-            objects.push_back(object);
-        }
-    }
-
-    return objects;
-}
-
-GameObject* Scene::CreateGameObject() {
-    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(*this)));
-    return m_SceneGameObjects.back().get();
-}
-
-GameObject* Scene::CreateGameObject(const std::string_view goName) {
-    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(*this)));
-    return m_SceneGameObjects.back().get();
-}
+Scene::Scene(const std::string_view name) : name(name) { }
 
 void Scene::Start() {
     for(auto& gameObject : m_SceneGameObjects) {
@@ -269,4 +260,36 @@ void Scene::Render() const {
     for(auto& gameObject : m_SceneGameObjects) {
         gameObject->Render();
     }
+}
+
+GameObject* Scene::CreateGameObject() {
+    m_SceneGameObjects.push_back(new GameObject(this));
+    return m_SceneGameObjects.back();
+}
+
+GameObject* Scene::CreateGameObject(const std::string_view goName) {
+    m_SceneGameObjects.push_back(new GameObject(goName, this));
+    return m_SceneGameObjects.back();
+}
+
+GameObject* Scene::FindObjectByName(const std::string_view searchName) {
+    for(auto& object : m_SceneGameObjects) {
+        if(object->name == searchName) {
+            return object;
+        }
+    }
+
+    return nullptr;
+}
+
+std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTag) {
+    std::vector<GameObject*> objects{};
+    
+    for(auto& object : m_SceneGameObjects) {
+        if(object->tag == searchTag) {
+            objects.push_back(object);
+        }
+    }
+
+    return objects;
 }

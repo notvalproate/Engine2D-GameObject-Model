@@ -17,8 +17,15 @@ class GameObject;
 
 class Component {
 public:
-    Component(std::shared_ptr<GameObject> gameObject);
-    virtual ~Component() {};
+    Component(GameObject* gameObject);
+
+    // Component(const Component& other);
+    // Component& operator=(const Component& other);
+
+    // Component(const Component&& other) noexcept;
+    // Component& operator=(const Component&& other) noexcept;
+
+    virtual ~Component();
 
     virtual void Awake() {};
     virtual void Start() {};
@@ -27,18 +34,19 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
-    std::shared_ptr<GameObject> gameObject;
-    std::shared_ptr<Transform> transform;
-    std::shared_ptr<std::string> tag;
+    GameObject* gameObject;
+    Transform* transform;
+    std::string* tag;
 };
 
 
 class Behaviour : public Component {
 public:
-    Behaviour(std::shared_ptr<GameObject> gameObject);
+    Behaviour(GameObject* gameObject);
 
-    bool enabled{true}, isActiveAndEnabled{true};
-    std::shared_ptr<std::string> name;
+    bool enabled;
+    bool isActiveAndEnabled;
+    std::string* name;
 };
 
 
@@ -63,21 +71,21 @@ public:
 
 class Transform final {
 public:
-    Transform(std::shared_ptr<GameObject> gameObject);
+    Transform(GameObject* gameObject);
     ~Transform();
 
     Vector2D position{};
     double rotation{};
     Vector2D scale{};
 
-    std::shared_ptr<GameObject> gameObject;
+    GameObject* gameObject;
 
-    std::shared_ptr<Transform> parent;
-    std::vector<std::shared_ptr<Transform>> m_Children{};
+    Transform* parent;
+    std::vector<Transform*> m_Children{};
     std::size_t childCount{};
 
-    std::shared_ptr<std::string> tag;
-    std::shared_ptr<std::string> name;
+    std::string* tag;
+    std::string* name;
 
     void Translate(const Vector2D& translation);
     void Rotate(const double angle);
@@ -85,41 +93,38 @@ public:
 
     void DetachChildren();
     void DetachFromParent();
-    Transform* Find(const std::string_view name) const;
+    Transform* Find(const std::string_view searchName) const;
     Transform* GetChild(const std::size_t index) const;
     size_t GetSiblingIndex() const;
     void SetAsFirstSibling() const;
     void SetAsLastSibling() const;
     void SetSiblingIndex(const std::size_t index) const;
-    bool IsChildOf(Transform& parentTransform) const;
-    void SetParent(Transform& parentTransform);
+    bool IsChildOf(Transform* parentTransform) const;
+    void SetParent(Transform* parentTransform);
 };
 
 class Scene;
 
 class GameObject final {
 public:
-    GameObject(Scene& scene);
-    GameObject(const std::string_view goName, Scene& scene);
+    GameObject(Scene* scene);
+    GameObject(const std::string_view goName, Scene* scene);
     ~GameObject();
     
     void Start();
     void Update();
     void Render() const;
 
-    static std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
-    static GameObject* FindObjectByName(const std::string_view searchName);
-
     template<typename T>
     void AddComponent() {
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            m_Behaviours.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Behaviours.push_back(new T(this));
             m_Behaviours.back()->Awake();
         }
         else {
-            m_Components.push_back(std::unique_ptr<T>(new T(*this)));
+            m_Components.push_back(new T(this));
             m_Components.back()->Awake();
         }
     }
@@ -131,12 +136,12 @@ public:
     }
 
     template<typename T>
-    T* GetComponent() const {
+    T* GetComponent() {
         AssertParametersAreDerived<T>();    
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            for(const auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(behaviour.get());
+            for(auto& behaviour : m_Behaviours) {
+                auto ptr = dynamic_cast<T*>(behaviour);
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -144,8 +149,8 @@ public:
             }
         }
         else {
-            for(const auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(component.get());
+            for(auto& component : m_Components) {
+                auto ptr = dynamic_cast<T*>(component);
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -157,14 +162,14 @@ public:
     }
 
     template<typename T>
-    T* GetComponentInChildren() const {
+    T* GetComponentInChildren() {
         AssertParametersAreDerived<T>();
 
         T* ptr = GetComponent<T>();
 
         if(ptr == nullptr) {
             for(auto& childTransform : transform.m_Children) {
-                ptr = childTransform->gameObject.GetComponentInChildren<T>();
+                ptr = childTransform->gameObject->GetComponentInChildren<T>();
 
                 if(ptr != nullptr) {
                     break;
@@ -176,27 +181,27 @@ public:
     }
 
     template<typename T>
-    T* GetComponentInParent() const {
+    T* GetComponentInParent() {
         AssertParametersAreDerived<T>();
 
         T* ptr = GetComponent<T>();
 
         if(ptr == nullptr && transform.parent) {
-            ptr = transform.parent->gameObject.GetComponentInParent<T>();
+            ptr = transform.parent->gameObject->GetComponentInParent<T>();
         }
 
         return ptr;
     }
 
     template<typename T>
-    std::vector<T*> GetComponents() const {
+    std::vector<T*> GetComponents() {
         AssertParametersAreDerived<T>();
 
         std::vector<T*> components{};
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            for(const auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(behaviour.get());
+            for(auto& behaviour : m_Behaviours) {
+                auto ptr = dynamic_cast<T*>(behaviour);
 
                 if(ptr != nullptr) {
                     components.push_back(ptr);
@@ -204,8 +209,8 @@ public:
             }
         }
         else {
-            for(const auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(component.get());
+            for(auto& component : m_Components) {
+                auto ptr = dynamic_cast<T*>(component);
 
                 if(ptr != nullptr) {
                     components.push_back(ptr);
@@ -217,13 +222,13 @@ public:
     }
 
     template<typename T>
-    std::vector<T*> GetComponentsInChildren() const {
+    std::vector<T*> GetComponentsInChildren() {
         AssertParametersAreDerived<T>();
 
         std::vector<T*> components = GetComponents<T>();
 
         for(auto& childTransform : transform.m_Children) {
-            auto componentsInChildren = childTransform->gameObject.GetComponentsInChildren<T>();
+            auto componentsInChildren = childTransform->gameObject->GetComponentsInChildren<T>();
 
             components.insert(std::end(components), std::begin(componentsInChildren), std::end(componentsInChildren));
         }
@@ -232,13 +237,13 @@ public:
     }
 
     template<typename T>
-    std::vector<T*> GetComponentsInParent() const {
+    std::vector<T*> GetComponentsInParent() {
         AssertParametersAreDerived<T>();
 
         std::vector<T*> components = GetComponents<T>();
 
         if(transform.parent) {
-            auto componentsInParent = transform.parent->gameObject.GetComponentsInParent<T>();
+            auto componentsInParent = transform.parent->gameObject->GetComponentsInParent<T>();
 
             components.insert(std::end(components), std::begin(componentsInParent), std::end(componentsInParent));
         }
@@ -246,16 +251,16 @@ public:
         return components;
     }
 
-    std::shared_ptr<std::string> name;
-    std::shared_ptr<std::string> tag;
-    std::shared_ptr<Transform> transform;
-    Scene& scene;
-    
+    // OWNED
+    std::string name;
+    std::string tag;
+    Transform transform;
+
+    // SHARED
+    Scene* scene;
 private:
-    std::vector<std::unique_ptr<Component>> m_Components{};
-    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
-    
-    static std::vector<GameObject*> m_GlobalGameObjectsList;
+    std::vector<Component*> m_Components{};
+    std::vector<Behaviour*> m_Behaviours{};
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -270,6 +275,9 @@ private:
 
 class Scene {
 public:
+    Scene();
+    Scene(const std::string_view name);
+
     virtual void SetupScene() = 0;
 
     void Start();
@@ -278,6 +286,13 @@ public:
 
     GameObject* CreateGameObject();
     GameObject* CreateGameObject(const std::string_view goName);
+
+    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
+    GameObject* FindObjectByName(const std::string_view searchName);
+
+    std::string name{};
 private:
-    std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};   
+    std::vector<GameObject*> m_SceneGameObjects{};
+
+    friend class GameObject;
 };
