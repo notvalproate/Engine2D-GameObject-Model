@@ -297,8 +297,8 @@ public:
     void Update();
     void Render() const;
 
-    GameObject& CreateGameObject();
-    GameObject& CreateGameObject(const std::string_view goName);
+    GameObject* CreateGameObject();
+    GameObject* CreateGameObject(const std::string_view goName);
 private:
-    std::vector<GameObject> m_SceneGameObjects{};   
+    std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};   
 };

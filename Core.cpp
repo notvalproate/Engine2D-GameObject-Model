@@ -243,32 +243,30 @@ std::vector<GameObject*> GameObject::FindObjectsByTag(const std::string_view sea
     return objects;
 }
 
-GameObject& Scene::CreateGameObject() {
-    m_SceneGameObjects.push_back(GameObject(*this));
-    return m_SceneGameObjects.back();
+GameObject* Scene::CreateGameObject() {
+    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(*this)));
+    return m_SceneGameObjects.back().get();
 }
 
-GameObject& Scene::CreateGameObject(const std::string_view goName) {
-    m_SceneGameObjects.push_back(GameObject(goName, *this));
-    return m_SceneGameObjects.back();
+GameObject* Scene::CreateGameObject(const std::string_view goName) {
+    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(*this)));
+    return m_SceneGameObjects.back().get();
 }
 
 void Scene::Start() {
-    // SetupScene();
-
-    // for(auto& gameObject : m_SceneGameObjects) {
-    //     gameObject.Start();
-    // }
+    for(auto& gameObject : m_SceneGameObjects) {
+        gameObject->Start();
+    }
 }
 
 void Scene::Update() {
-    // for(auto& gameObject : m_SceneGameObjects) {
-    //     gameObject.Update();
-    // }
+    for(auto& gameObject : m_SceneGameObjects) {
+        gameObject->Update();
+    }
 }
 
 void Scene::Render() const {
-    // for(auto& gameObject : m_SceneGameObjects) {
-    //     gameObject.Render();
-    // }
+    for(auto& gameObject : m_SceneGameObjects) {
+        gameObject->Render();
+    }
 }
