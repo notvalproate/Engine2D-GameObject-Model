@@ -103,7 +103,7 @@ void Transform::DetachFromParent() {
 
 Transform* Transform::Find(const std::string_view searchName) const {
     for(const auto& child : m_Children) {
-        if(*name == searchName) {
+        if(*child->name == searchName) {
             return child;
         }
     }
@@ -192,9 +192,9 @@ void Transform::SetParent(GameObject* parentGo) {
     SetParent(&parentGo->transform);
 }
 
-GameObject::GameObject(Scene* scene) : name({}), tag({}), transform(this), scene(scene) { }
+GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
-GameObject::GameObject(const std::string_view goName, Scene* scene) : name(goName), tag({}), transform(this), scene(scene) { }
+GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
 
 GameObject* GameObject::Instantiate(GameObject* gameObject) {
@@ -269,12 +269,12 @@ void Scene::Render() const {
 }
 
 GameObject* Scene::CreateGameObject() {
-    m_SceneGameObjects.push_back(std::make_unique<GameObject>(this));
+    m_SceneGameObjects.push_back(std::make_unique<GameObject>(this, LatestSceneInstanceID++));
     return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::CreateGameObject(const std::string_view goName) {
-    m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this));
+    m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this, LatestSceneInstanceID++));
     return m_SceneGameObjects.back().get();
 }
 

@@ -12,6 +12,21 @@ public:
         health = 10;
     }
 
+    void Start() override {
+        std::cout << "Player instance id is " << gameObject->m_SceneInstanceID << std::endl;
+        Transform* Weapon = transform->Find("Weapon");
+        Transform* Trinket = nullptr;
+
+        if(Weapon) {
+            std::cout << "Weapon instance id is " << Weapon->gameObject->m_SceneInstanceID << std::endl;
+            Trinket = Weapon->Find("Trinket");
+        }
+
+        if(Trinket) {
+            std::cout << "Trinket instance id is " << Trinket->gameObject->m_SceneInstanceID << std::endl;
+        }
+    }
+
     void Update() override {
         transform->position.x += 1;
         std::cout << "Player Moved to " << transform->position.x << std::endl;

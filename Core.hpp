@@ -113,8 +113,8 @@ class Scene;
 
 class GameObject final {
 public:
-    GameObject(Scene* scene);
-    GameObject(const std::string_view goName, Scene* scene);
+    GameObject(Scene* scene, const uint32_t id);
+    GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
     static GameObject* Instantiate(GameObject* gameObject);
     static void Destroy(GameObject* gameObject);
@@ -267,11 +267,11 @@ public:
 
     // SHARED
     Scene* scene;
+    uint32_t m_SceneInstanceID;
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
 
-    uint32_t m_SceneInstanceID;
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -304,7 +304,6 @@ public:
 private:
     std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
 
-    std::vector<uint32_t> AvailableSceneInstanceIDs{};
     uint32_t LatestSceneInstanceID{};
 
     friend class GameObject;
