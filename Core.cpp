@@ -263,19 +263,19 @@ void Scene::Render() const {
 }
 
 GameObject* Scene::CreateGameObject() {
-    m_SceneGameObjects.push_back(new GameObject(this));
-    return m_SceneGameObjects.back();
+    m_SceneGameObjects.push_back(std::make_unique<GameObject>(this));
+    return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::CreateGameObject(const std::string_view goName) {
-    m_SceneGameObjects.push_back(new GameObject(goName, this));
-    return m_SceneGameObjects.back();
+    m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this));
+    return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::FindObjectByName(const std::string_view searchName) {
     for(auto& object : m_SceneGameObjects) {
-        if(object->name == searchName) {
-            return object;
+        if(object.get()->name == searchName) {
+            return object.get();
         }
     }
 
@@ -286,8 +286,8 @@ std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTa
     std::vector<GameObject*> objects{};
     
     for(auto& object : m_SceneGameObjects) {
-        if(object->tag == searchTag) {
-            objects.push_back(object);
+        if(object.get()->tag == searchTag) {
+            objects.push_back(object.get());
         }
     }
 

@@ -15,7 +15,7 @@ public:
 
         auto childLocalPosDebugger = gameObject->GetComponentInChildren<LocalPositionDebug>();
 
-        if(childLocalPosDebugger) {
+        if(childLocalPosDebugger != nullptr) {
             childLocalPosDebugger->Update();
         }
     }

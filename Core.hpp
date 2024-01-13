@@ -19,12 +19,6 @@ class Component {
 public:
     Component(GameObject* gameObject);
 
-    // Component(const Component& other);
-    // Component& operator=(const Component& other);
-
-    // Component(const Component&& other) noexcept;
-    // Component& operator=(const Component&& other) noexcept;
-
     virtual ~Component();
 
     virtual void Awake() {};
@@ -120,12 +114,12 @@ public:
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            m_Behaviours.push_back(new T(this));
-            m_Behaviours.back()->Awake();
+            m_Behaviours.push_back(std::make_unique<T>(this));
+            m_Behaviours.back().get()->Awake();
         }
         else {
-            m_Components.push_back(new T(this));
-            m_Components.back()->Awake();
+            m_Components.push_back(std::make_unique<T>(this));
+            m_Components.back().get()->Awake();
         }
     }
 
@@ -141,7 +135,7 @@ public:
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             for(auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(behaviour);
+                auto ptr = dynamic_cast<T*>(behaviour.get());
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -150,7 +144,7 @@ public:
         }
         else {
             for(auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(component);
+                auto ptr = dynamic_cast<T*>(component.get());
 
                 if(ptr != nullptr) {
                     return ptr;
@@ -201,7 +195,7 @@ public:
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             for(auto& behaviour : m_Behaviours) {
-                auto ptr = dynamic_cast<T*>(behaviour);
+                auto ptr = dynamic_cast<T*>(behaviour.get());
 
                 if(ptr != nullptr) {
                     components.push_back(ptr);
@@ -210,7 +204,7 @@ public:
         }
         else {
             for(auto& component : m_Components) {
-                auto ptr = dynamic_cast<T*>(component);
+                auto ptr = dynamic_cast<T*>(component.get());
 
                 if(ptr != nullptr) {
                     components.push_back(ptr);
@@ -259,8 +253,8 @@ public:
     // SHARED
     Scene* scene;
 private:
-    std::vector<Component*> m_Components{};
-    std::vector<Behaviour*> m_Behaviours{};
+    std::vector<std::unique_ptr<Component>> m_Components{};
+    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -292,7 +286,7 @@ public:
 
     std::string name{};
 private:
-    std::vector<GameObject*> m_SceneGameObjects{};
+    std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
 
     friend class GameObject;
 };
