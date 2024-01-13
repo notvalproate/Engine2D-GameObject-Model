@@ -270,6 +270,8 @@ public:
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
+
+    uint32_t m_SceneInstanceID;
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -298,11 +300,14 @@ public:
     GameObject* FindObjectByName(const std::string_view searchName);
 
     std::string name{};
+
 private:
     std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
 
+    std::vector<uint32_t> AvailableSceneInstanceIDs{};
+    uint32_t LatestSceneInstanceID{};
+
     friend class GameObject;
 };
-
 
 // SOME COMPONENTS:

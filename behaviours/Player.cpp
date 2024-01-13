@@ -21,7 +21,6 @@ public:
         health--;
         std::cout << "Player health reduced to " <<  health << std::endl;
         if(health == 0) {
-            enabled = false;
             Death();
         }
     }

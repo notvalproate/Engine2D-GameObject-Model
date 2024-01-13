@@ -15,9 +15,6 @@ public:
             transform->position.x--;
             std::cout << "Player Hit a wall!" << std::endl;
             playerScript->HitWall();
-            if(playerScript->health == 0) {
-                enabled = false;
-            }
         }
     }
 
