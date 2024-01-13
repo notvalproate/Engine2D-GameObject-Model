@@ -9,6 +9,12 @@ public:
     void SetupScene() override {
         auto PlayerObject = CreateGameObject("Player");
         PlayerObject->AddComponent<Player, PlayerController>();
+
+        auto WeaponObject = CreateGameObject("Weapon");
+        WeaponObject->transform.SetParent(PlayerObject);
+
+        auto TrinketObject = CreateGameObject("Trinket");
+        TrinketObject->transform.SetParent(WeaponObject);
     }
 };
 

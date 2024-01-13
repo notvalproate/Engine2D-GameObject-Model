@@ -43,10 +43,7 @@ const Vector2D Vector2D::zero(0.0, 0.0);
 
 Transform::Transform(GameObject* gameObject) : gameObject(gameObject), parent(nullptr), tag(&gameObject->tag), name(&gameObject->name) { };
 
-Transform::~Transform() {
-    DetachFromParent();
-    DetachChildren();
-}
+Transform::~Transform() { }
 
 void Transform::Translate(const Vector2D& translation) {
     position.x += translation.x;
@@ -171,6 +168,14 @@ bool Transform::IsChildOf(Transform* parentTransform) const {
     return false;
 }
 
+bool Transform::IsChildOf(Transform& parentTransform) const {
+    return IsChildOf(&parentTransform);
+}
+
+bool Transform::IsChildOf(GameObject* parentGo) const {
+    return IsChildOf(&parentGo->transform);
+}
+
 void Transform::SetParent(Transform* parentTransform) {
     DetachFromParent();
 
@@ -179,11 +184,41 @@ void Transform::SetParent(Transform* parentTransform) {
     parent->childCount++;
 }
 
+void Transform::SetParent(Transform& parentTransform) {
+    SetParent(&parentTransform);
+}
+
+void Transform::SetParent(GameObject* parentGo) {
+    SetParent(&parentGo->transform);
+}
+
 GameObject::GameObject(Scene* scene) : name({}), tag({}), transform(this), scene(scene) { }
 
 GameObject::GameObject(const std::string_view goName, Scene* scene) : name(goName), tag({}), transform(this), scene(scene) { }
 
-GameObject::~GameObject() { }
+
+GameObject* GameObject::Instantiate(GameObject* gameObject) {
+    return gameObject;
+}
+
+void GameObject::Destroy(GameObject* gameObject) {
+    for(auto& childTransform : gameObject->transform.m_Children) {
+        Destroy(childTransform->gameObject);
+    }   
+
+    std::cout << "Destroying " << gameObject->name << std::endl;
+
+    for(std::size_t i = 0; i < gameObject->scene->m_SceneGameObjects.size(); i++) {
+        if(gameObject->scene->m_SceneGameObjects[i].get() == gameObject) {
+            gameObject->scene->m_SceneGameObjects.erase(gameObject->scene->m_SceneGameObjects.begin() + i);
+            break;
+        }
+    }
+}
+
+void GameObject::DestroyImmediate(GameObject* gameObject) {
+
+}
 
 void GameObject::Start() {
     for (auto& behaviour : m_Behaviours) {

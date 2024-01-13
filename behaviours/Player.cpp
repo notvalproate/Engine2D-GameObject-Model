@@ -28,6 +28,7 @@ public:
 
     void Death() {
         std::cout << "Player died! Game Over!" << std::endl;
+        GameObject::Destroy(gameObject);
     }
 
     unsigned int health;

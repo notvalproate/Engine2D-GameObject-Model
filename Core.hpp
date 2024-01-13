@@ -77,7 +77,6 @@ public:
     GameObject* gameObject;
 
     Transform* parent;
-    std::vector<Transform*> m_Children{};
     std::size_t childCount{};
 
     std::string* tag;
@@ -95,8 +94,19 @@ public:
     void SetAsFirstSibling() const;
     void SetAsLastSibling() const;
     void SetSiblingIndex(const std::size_t index) const;
+
     bool IsChildOf(Transform* parentTransform) const;
+    bool IsChildOf(Transform& parentTransform) const;
+    bool IsChildOf(GameObject* parentGo) const;
+
     void SetParent(Transform* parentTransform);
+    void SetParent(Transform& parentTransform);
+    void SetParent(GameObject* parentGo);
+
+private:
+    std::vector<Transform*> m_Children{};
+
+    friend class GameObject;
 };
 
 class Scene;
@@ -105,7 +115,10 @@ class GameObject final {
 public:
     GameObject(Scene* scene);
     GameObject(const std::string_view goName, Scene* scene);
-    ~GameObject();
+
+    static GameObject* Instantiate(GameObject* gameObject);
+    static void Destroy(GameObject* gameObject);
+    static void DestroyImmediate(GameObject* gameObject);
     
     void Start();
     void Update();
@@ -265,8 +278,6 @@ private:
             "Custom Component provided not derived from Component Class"
         );
     }
-
-    friend class Scene;
 };
 
 class Scene {

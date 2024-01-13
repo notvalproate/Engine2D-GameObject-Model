@@ -8,12 +8,11 @@ public:
 
     void Start() override {
         playerScript = gameObject->GetComponent<Player>();
-        playerTransform = playerScript->transform;
     }
 
     void Update() override {
-        if(playerTransform->position.x == 4) {
-            playerTransform->position.x--;
+        if(transform->position.x == 4) {
+            transform->position.x--;
             std::cout << "Player Hit a wall!" << std::endl;
             playerScript->HitWall();
             if(playerScript->health == 0) {
