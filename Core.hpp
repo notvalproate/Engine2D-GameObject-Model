@@ -38,6 +38,8 @@ class Behaviour : public Component {
 public:
     Behaviour(GameObject* gameObject);
 
+    void Render() const override final { };
+
     bool enabled;
     bool isActiveAndEnabled;
     std::string* name;
@@ -290,3 +292,6 @@ private:
 
     friend class GameObject;
 };
+
+
+// SOME COMPONENTS:

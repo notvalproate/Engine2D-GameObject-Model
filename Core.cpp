@@ -5,30 +5,6 @@
 
 Component::Component(GameObject* gameObject) : gameObject(gameObject), transform(&gameObject->transform), tag(&gameObject->tag) { }
 
-// Component::Component(const Component& other) {
-//     *this = other;
-// }
-
-// Component& Component::operator=(const Component& other) {
-//     gameObject = other.gameObject;
-//     transform = other.transform;
-//     tag = other.tag;
-
-//     return *this;
-// }
-
-// Component::Component(const Component&& other) noexcept {
-//     *this = std::move(other);
-// }
-
-// Component& Component::operator=(const Component&& other) noexcept {
-//     gameObject = other.gameObject;
-//     transform = other.transform;
-//     tag = other.tag;
-
-//     return *this;
-// }
-
 Component::~Component() { }
 
 bool Component::CompareTag(const std::string_view otherTag) const {
@@ -230,11 +206,6 @@ void GameObject::Update() {
 }
 
 void GameObject::Render() const {
-    for (const auto& behaviour : m_Behaviours) {
-        if(behaviour->enabled) {
-            behaviour->Render();
-        }
-    }
     for(const auto& component : m_Components) {
         component->Render();
     }
