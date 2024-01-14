@@ -303,6 +303,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
+    std::vector<GameObject*> m_StagedForDestruction{};
 
     uint32_t LatestSceneInstanceID{};
 

@@ -202,22 +202,24 @@ GameObject* GameObject::Instantiate(GameObject* gameObject) {
 }
 
 void GameObject::Destroy(GameObject* gameObject) {
+    gameObject->scene->m_StagedForDestruction.push_back(gameObject);
+}
+
+void GameObject::DestroyImmediate(GameObject* gameObject) {
     for(auto& childTransform : gameObject->transform.m_Children) {
-        Destroy(childTransform->gameObject);
+        DestroyImmediate(childTransform->gameObject);
     }   
 
     std::cout << "Destroying " << gameObject->name << std::endl;
 
-    for(std::size_t i = 0; i < gameObject->scene->m_SceneGameObjects.size(); i++) {
-        if(gameObject->scene->m_SceneGameObjects[i].get() == gameObject) {
-            gameObject->scene->m_SceneGameObjects.erase(gameObject->scene->m_SceneGameObjects.begin() + i);
+    auto& SceneObjects = gameObject->scene->m_SceneGameObjects;
+
+    for (auto it = SceneObjects.begin(); it != SceneObjects.end(); ++it) {
+        if (it->get() == gameObject) {
+            SceneObjects.erase(it);
             break;
         }
     }
-}
-
-void GameObject::DestroyImmediate(GameObject* gameObject) {
-
 }
 
 void GameObject::Start() {
@@ -259,6 +261,13 @@ void Scene::Start() {
 void Scene::Update() {
     for(auto& gameObject : m_SceneGameObjects) {
         gameObject->Update();
+    }
+
+    if(m_StagedForDestruction.size()) {
+        for(auto& gO : m_StagedForDestruction) {
+            GameObject::DestroyImmediate(gO);
+        }
+        m_StagedForDestruction.clear();
     }
 }
 
