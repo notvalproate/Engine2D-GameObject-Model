@@ -196,8 +196,6 @@ GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), tra
 
 GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
-#include <windows.h>
-
 GameObject* GameObject::Instantiate(GameObject* gameObject) {
     GameObject* newGameObject = gameObject->scene->CreateGameObject(gameObject->name);
 
