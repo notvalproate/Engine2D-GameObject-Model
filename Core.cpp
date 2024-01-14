@@ -200,29 +200,7 @@ GameObject* GameObject::Instantiate(GameObject* gameObject) {
     GameObject* newGameObject = gameObject->scene->CreateGameObject(gameObject->name);
 
     for(auto& childTransform : gameObject->transform.m_Children) {
-        auto childObject = Instantiate(childTransform->gameObject);
-        childObject->transform.parent = &newGameObject->transform;
-    }
-
-    for(const auto& component : gameObject->m_Components) {
-        // auto newComponent = component.get()->Clone();
-
-        // newComponent.get()->gameObject = newGameObject;
-        // newComponent.get()->transform = &newGameObject->transform;
-        // newComponent.get()->tag = &newGameObject->tag;
-
-        // newGameObject->m_Components.push_back(std::move(newComponent));
-    }
-
-    for(const auto& behaviour : gameObject->m_Behaviours) {
-        auto newBehaviour = behaviour.get()->Clone();
-
-        newBehaviour.get()->gameObject = newGameObject;
-        newBehaviour.get()->transform = &newGameObject->transform;
-        newBehaviour.get()->tag = &newGameObject->tag;
-        newBehaviour.get()->name = &newGameObject->name;
-
-        newGameObject->m_Components.push_back(std::move(newBehaviour));
+        Instantiate(childTransform->gameObject, &newGameObject->transform);
     }
 
     return newGameObject;
