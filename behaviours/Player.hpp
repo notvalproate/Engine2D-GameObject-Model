@@ -25,13 +25,11 @@ public:
         if(Trinket) {
             std::cout << "Trinket instance id is " << Trinket->gameObject->m_SceneInstanceID << std::endl;
         }
-        
-        GameObject::Instantiate(gameObject);
     }
 
     void Update() override {
         transform->position.x += 1;
-        std::cout << "Player Moved to " << transform->position.x << std::endl;
+        std::cout << *name << " Moved to " << transform->position.x << std::endl;
     }
 
     void HitWall() {
@@ -48,4 +46,8 @@ public:
     }
 
     unsigned int health;
+
+    std::unique_ptr<Component> Clone() const {
+        return std::make_unique<Player>(*this);
+    }
 }; 

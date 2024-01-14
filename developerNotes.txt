@@ -1,5 +1,4 @@
 {
-    [2024-01-10 ; 16:47]
-    - Make a scene class that implments a Scene and its game objects.
-    - Implement a way Start is called after all Awakes of the Scene are called.
+    [2024-01-14 ; 13:18]
+    - Make Destroy methods for Component class that remove the component from the gameobject.
 }

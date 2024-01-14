@@ -20,4 +20,8 @@ public:
 
     Player* playerScript;
     Transform* playerTransform;
+
+    std::unique_ptr<Component> Clone() const {
+        return std::make_unique<PlayerController>(*this);
+    }
 };

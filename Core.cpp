@@ -11,7 +11,26 @@ bool Component::CompareTag(const std::string_view otherTag) const {
     return *tag == otherTag;
 }
 
+void Component::AttachGameObject(GameObject* newGameObject) {
+    gameObject = newGameObject;
+    transform = &newGameObject->transform;
+    tag = &newGameObject->tag;
+}
+
+std::unique_ptr<Component> Component::Clone() const {
+    return std::make_unique<Component>(*this);
+};
+
 Behaviour::Behaviour(GameObject* gameObject) : Component(gameObject), enabled(true), isActiveAndEnabled(true), name(&gameObject->name) { }
+
+void Behaviour::AttachGameObject(GameObject* newGameObject) {
+    Component::AttachGameObject(newGameObject);
+    tag = &newGameObject->tag;
+}
+
+std::unique_ptr<Component> Behaviour::Clone() const {
+    return std::make_unique<Behaviour>(*this);
+}
 
 Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
 
@@ -197,18 +216,37 @@ GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), tra
 GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
 GameObject* GameObject::Instantiate(GameObject* gameObject) {
-    GameObject* newGameObject = gameObject->scene->CreateGameObject(gameObject->name);
+    std::string newName = gameObject->name + " " + std::to_string(gameObject->scene->LatestSceneInstanceID);
+    
+    GameObject* newGameObject = gameObject->scene->CreateGameObject(newName);
 
     for(auto& childTransform : gameObject->transform.m_Children) {
-        Instantiate(childTransform->gameObject, &newGameObject->transform);
+        GameObject* childGameObject = Instantiate(childTransform->gameObject);
+        childGameObject->transform.SetParent(&newGameObject->transform);
+    }
+
+    for(auto& behaviour : gameObject->m_Behaviours) {
+        auto componentClone = behaviour.get()->Clone();
+        std::unique_ptr<Behaviour> behaviourCasted(static_cast<Behaviour*>(componentClone.release()));
+
+        behaviourCasted.get()->AttachGameObject(newGameObject);
+
+        newGameObject->m_Behaviours.push_back(std::move(behaviourCasted));
+    }
+
+    for(auto& component : gameObject->m_Components) {
+        auto componentClone = component.get()->Clone();
+
+        componentClone.get()->AttachGameObject(newGameObject);
+
+        newGameObject->m_Components.push_back(std::move(componentClone));
+    }
+
+    if(newGameObject->transform.parent == nullptr) {
+        StartDownHeirarchy(newGameObject);
     }
 
     return newGameObject;
-}
-
-GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent) {
-    GameObject* newGameObject = Instantiate(gameObject);
-    newGameObject->transform.SetParent(parent);
 }
 
 void GameObject::Destroy(GameObject* gameObject) {
@@ -219,8 +257,6 @@ void GameObject::DestroyImmediate(GameObject* gameObject) {
     for(auto& childTransform : gameObject->transform.m_Children) {
         DestroyImmediate(childTransform->gameObject);
     }   
-
-    std::cout << "Destroying " << gameObject->name << std::endl;
 
     std::vector<std::unique_ptr<GameObject>>& SceneObjects = gameObject->scene->m_SceneGameObjects;
 
@@ -258,6 +294,14 @@ void GameObject::Render() const {
     }
 }
 
+void GameObject::StartDownHeirarchy(GameObject* gameObject) {
+    gameObject->Start();
+
+    for(auto& childTransform : gameObject->transform.m_Children) {
+        childTransform->gameObject->Start();
+    }
+}
+
 Scene::Scene() { }
 
 Scene::Scene(const std::string_view name) : name(name) { }
@@ -289,13 +333,11 @@ void Scene::Render() const {
 
 GameObject* Scene::CreateGameObject() {
     m_SceneGameObjects.push_back(std::make_unique<GameObject>(this, LatestSceneInstanceID++));
-    std::cout << "Added game object to scene: " << m_SceneGameObjects.back().get()->name << std::endl;
     return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::CreateGameObject(const std::string_view goName) {
     m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this, LatestSceneInstanceID++));
-    std::cout << "Added game object to scene: " << m_SceneGameObjects.back().get()->name << std::endl;
     return m_SceneGameObjects.back().get();
 }
 

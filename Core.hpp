@@ -18,7 +18,6 @@ class GameObject;
 class Component {
 public:
     Component(GameObject* gameObject);
-
     virtual ~Component();
 
     virtual void Awake() {};
@@ -28,11 +27,15 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
-    std::unique_ptr<Component> Clone() const { };
-
     GameObject* gameObject;
     Transform* transform;
     std::string* tag;
+
+protected:
+    virtual void AttachGameObject(GameObject* newGameObject);
+    virtual std::unique_ptr<Component> Clone() const;
+
+    friend class GameObject;
 };
 
 
@@ -47,9 +50,8 @@ public:
     std::string* name;
 
 private:
-    std::unique_ptr<Behaviour> Clone() const {
-        return std::make_unique<Behaviour>(*this);
-    }
+    void AttachGameObject(GameObject* newGameObject) override;
+    std::unique_ptr<Component> Clone() const override;
 
     friend class GameObject;
 };
@@ -126,7 +128,6 @@ public:
     GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
     static GameObject* Instantiate(GameObject* gameObject);
-    static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
     
@@ -281,7 +282,6 @@ public:
 private:
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
-
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -290,6 +290,8 @@ private:
             "Custom Component provided not derived from Component Class"
         );
     }
+
+    static void StartDownHeirarchy(GameObject* gameObject);
 };
 
 class Scene {

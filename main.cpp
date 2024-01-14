@@ -15,6 +15,8 @@ public:
 
         auto TrinketObject = CreateGameObject("Trinket");
         TrinketObject->transform.SetParent(WeaponObject);
+
+        GameObject::Instantiate(PlayerObject);
     }
 };
 
