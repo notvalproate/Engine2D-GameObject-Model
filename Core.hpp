@@ -28,6 +28,8 @@ public:
 
     bool CompareTag(const std::string_view otherTag) const;
 
+    std::unique_ptr<Component> Clone() const { };
+
     GameObject* gameObject;
     Transform* transform;
     std::string* tag;
@@ -43,6 +45,13 @@ public:
     bool enabled;
     bool isActiveAndEnabled;
     std::string* name;
+
+private:
+    std::unique_ptr<Behaviour> Clone() const {
+        return std::make_unique<Behaviour>(*this);
+    }
+
+    friend class GameObject;
 };
 
 
@@ -117,6 +126,7 @@ public:
     GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
     static GameObject* Instantiate(GameObject* gameObject);
+    static GameObject* Instantiate(GameObject* gameObject, Transform* parent);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
     

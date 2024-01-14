@@ -196,9 +196,43 @@ GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), tra
 
 GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
+#include <windows.h>
 
 GameObject* GameObject::Instantiate(GameObject* gameObject) {
-    return gameObject;
+    GameObject* newGameObject = gameObject->scene->CreateGameObject(gameObject->name);
+
+    for(auto& childTransform : gameObject->transform.m_Children) {
+        auto childObject = Instantiate(childTransform->gameObject);
+        childObject->transform.parent = &newGameObject->transform;
+    }
+
+    for(const auto& component : gameObject->m_Components) {
+        // auto newComponent = component.get()->Clone();
+
+        // newComponent.get()->gameObject = newGameObject;
+        // newComponent.get()->transform = &newGameObject->transform;
+        // newComponent.get()->tag = &newGameObject->tag;
+
+        // newGameObject->m_Components.push_back(std::move(newComponent));
+    }
+
+    for(const auto& behaviour : gameObject->m_Behaviours) {
+        auto newBehaviour = behaviour.get()->Clone();
+
+        newBehaviour.get()->gameObject = newGameObject;
+        newBehaviour.get()->transform = &newGameObject->transform;
+        newBehaviour.get()->tag = &newGameObject->tag;
+        newBehaviour.get()->name = &newGameObject->name;
+
+        newGameObject->m_Components.push_back(std::move(newBehaviour));
+    }
+
+    return newGameObject;
+}
+
+GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parent) {
+    GameObject* newGameObject = Instantiate(gameObject);
+    newGameObject->transform.SetParent(parent);
 }
 
 void GameObject::Destroy(GameObject* gameObject) {
@@ -212,7 +246,7 @@ void GameObject::DestroyImmediate(GameObject* gameObject) {
 
     std::cout << "Destroying " << gameObject->name << std::endl;
 
-    auto& SceneObjects = gameObject->scene->m_SceneGameObjects;
+    std::vector<std::unique_ptr<GameObject>>& SceneObjects = gameObject->scene->m_SceneGameObjects;
 
     for (auto it = SceneObjects.begin(); it != SceneObjects.end(); ++it) {
         if (it->get() == gameObject) {
@@ -279,11 +313,13 @@ void Scene::Render() const {
 
 GameObject* Scene::CreateGameObject() {
     m_SceneGameObjects.push_back(std::make_unique<GameObject>(this, LatestSceneInstanceID++));
+    std::cout << "Added game object to scene: " << m_SceneGameObjects.back().get()->name << std::endl;
     return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::CreateGameObject(const std::string_view goName) {
     m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this, LatestSceneInstanceID++));
+    std::cout << "Added game object to scene: " << m_SceneGameObjects.back().get()->name << std::endl;
     return m_SceneGameObjects.back().get();
 }
 
