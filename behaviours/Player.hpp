@@ -7,6 +7,12 @@ class Player : public Behaviour {
 public:
     using Behaviour::Behaviour;
 
+    std::unique_ptr<Component> Clone() const {
+        return std::make_unique<Player>(*this);
+    }
+
+    // Your Code Goes Here
+
     void Awake() override {
         std::cout << "Player has awoken!" << std::endl;
         health = 10;
@@ -46,8 +52,4 @@ public:
     }
 
     unsigned int health;
-
-    std::unique_ptr<Component> Clone() const {
-        return std::make_unique<Player>(*this);
-    }
 }; 

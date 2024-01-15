@@ -128,6 +128,7 @@ public:
     GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
     static GameObject* Instantiate(GameObject* gameObject);
+    static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
     

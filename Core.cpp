@@ -25,7 +25,7 @@ Behaviour::Behaviour(GameObject* gameObject) : Component(gameObject), enabled(tr
 
 void Behaviour::AttachGameObject(GameObject* newGameObject) {
     Component::AttachGameObject(newGameObject);
-    tag = &newGameObject->tag;
+    name = &newGameObject->name;
 }
 
 std::unique_ptr<Component> Behaviour::Clone() const {
@@ -216,13 +216,11 @@ GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), tra
 GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
 GameObject* GameObject::Instantiate(GameObject* gameObject) {
-    std::string newName = gameObject->name + " " + std::to_string(gameObject->scene->LatestSceneInstanceID);
-    
+    std::string newName = gameObject->name + " #" + std::to_string(gameObject->scene->LatestSceneInstanceID);
     GameObject* newGameObject = gameObject->scene->CreateGameObject(newName);
 
     for(auto& childTransform : gameObject->transform.m_Children) {
-        GameObject* childGameObject = Instantiate(childTransform->gameObject);
-        childGameObject->transform.SetParent(&newGameObject->transform);
+        Instantiate(childTransform->gameObject, &newGameObject->transform);
     }
 
     for(auto& behaviour : gameObject->m_Behaviours) {
@@ -242,9 +240,12 @@ GameObject* GameObject::Instantiate(GameObject* gameObject) {
         newGameObject->m_Components.push_back(std::move(componentClone));
     }
 
-    if(newGameObject->transform.parent == nullptr) {
-        StartDownHeirarchy(newGameObject);
-    }
+    return newGameObject;
+}
+
+GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parentTransform) {
+    GameObject* newGameObject = Instantiate(gameObject);
+    newGameObject->transform.SetParent(parentTransform);
 
     return newGameObject;
 }
