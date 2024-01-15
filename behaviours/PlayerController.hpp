@@ -26,6 +26,4 @@ public:
 
     Player* playerScript;
     Transform* playerTransform;
-
-    
 };

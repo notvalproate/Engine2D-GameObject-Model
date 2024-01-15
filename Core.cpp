@@ -363,3 +363,19 @@ std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTa
 
     return objects;
 }
+
+GameObject* Scene::Instantiate(GameObject* gameObject) {
+    return GameObject::Instantiate(gameObject);
+}
+
+GameObject* Scene::Instantiate(GameObject* gameObject, Transform* parentTransform) {
+    return GameObject::Instantiate(gameObject, parentTransform);
+}
+
+void Scene::Destroy(GameObject* gameObject) {
+    GameObject::Destroy(gameObject);
+}
+
+void Scene::DestroyImmediate(GameObject* gameObject) {
+    GameObject::DestroyImmediate(gameObject);
+}

@@ -14,7 +14,7 @@ public:
     // Your Code Goes Here
 
     void Awake() override {
-        std::cout << "Player has awoken!" << std::endl;
+        std::cout << *name << " has awoken!" << std::endl;
         health = 10;
     }
 
@@ -40,7 +40,7 @@ public:
 
     void HitWall() {
         health--;
-        std::cout << "Player health reduced to " <<  health << std::endl;
+        std::cout << *name << " health reduced to " <<  health << std::endl;
         if(health == 0) {
             Death();
             GameObject::Destroy(gameObject);

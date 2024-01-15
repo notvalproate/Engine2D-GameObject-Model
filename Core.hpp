@@ -306,6 +306,11 @@ public:
     void Update();
     void Render() const;
 
+    static GameObject* Instantiate(GameObject* gameObject);
+    static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
+    static void Destroy(GameObject* gameObject);
+    static void DestroyImmediate(GameObject* gameObject);
+
     GameObject* CreateGameObject();
     GameObject* CreateGameObject(const std::string_view goName);
 
