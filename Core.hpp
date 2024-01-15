@@ -129,6 +129,7 @@ public:
 
     static GameObject* Instantiate(GameObject* gameObject);
     static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
+    static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
     
@@ -308,6 +309,7 @@ public:
 
     static GameObject* Instantiate(GameObject* gameObject);
     static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
+    static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
 

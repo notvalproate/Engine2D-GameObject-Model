@@ -16,7 +16,7 @@ public:
         auto TrinketObject = CreateGameObject("Trinket");
         TrinketObject->transform.SetParent(WeaponObject);
 
-        Instantiate(PlayerObject);
+        Instantiate(PlayerObject, Vector2D(3, 0), 0);
     }
 };
 

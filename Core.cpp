@@ -250,6 +250,14 @@ GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parentTra
     return newGameObject;
 }
 
+GameObject* GameObject::Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation) {
+    GameObject* newGameObject = Instantiate(gameObject);
+    newGameObject->transform.position = position;
+    newGameObject->transform.rotation = rotation;
+
+    return newGameObject;
+}
+
 void GameObject::Destroy(GameObject* gameObject) {
     gameObject->scene->m_StagedForDestruction.push_back(gameObject);
 }
@@ -370,6 +378,10 @@ GameObject* Scene::Instantiate(GameObject* gameObject) {
 
 GameObject* Scene::Instantiate(GameObject* gameObject, Transform* parentTransform) {
     return GameObject::Instantiate(gameObject, parentTransform);
+}
+
+GameObject* Scene::Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation) {
+    return GameObject::Instantiate(gameObject, position, rotation);
 }
 
 void Scene::Destroy(GameObject* gameObject) {
