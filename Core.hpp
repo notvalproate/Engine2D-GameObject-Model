@@ -136,17 +136,18 @@ public:
     void Render() const;
 
     template<typename T>
-    void AddComponent() {
+    T* AddComponent() {
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
             m_Behaviours.push_back(std::make_unique<T>(this));
             m_Behaviours.back().get()->Awake();
+            return static_cast<T*>(m_Behaviours.back().get());
         }
-        else {
-            m_Components.push_back(std::make_unique<T>(this));
-            m_Components.back().get()->Awake();
-        }
+
+        m_Components.push_back(std::make_unique<T>(this));
+        m_Components.back().get()->Awake();
+        m_Components.back().get();
     }
 
     template<typename First, typename Second, typename... Args>
