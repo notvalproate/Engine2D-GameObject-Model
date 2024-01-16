@@ -9,11 +9,44 @@
 #include <algorithm>
 #include <functional>
 
+class Object;
+class Component;
+class Behaviour;
+class GameObject;
+class Scene;
+
+class Vector2D;
 class Transform;
 
-class GameObject;
+class Object {
+public:
+    static GameObject* Instantiate(GameObject* gameObject);
+    static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
+    static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
+    static void Destroy(GameObject* gameObject);
+    static void DestroyImmediate(GameObject* gameObject);
+};
 
-class Component {
+class Vector2D {
+public:
+    Vector2D() = default;
+    Vector2D(double x, double y);
+
+    double x{}, y{};
+
+	double GetMagnitude() const;
+    void Normalize();
+	void Scale(const int factor);
+
+    static const Vector2D up;
+    static const Vector2D down;
+    static const Vector2D left;
+    static const Vector2D right;
+    static const Vector2D one;
+    static const Vector2D zero;
+};
+
+class Component : public Object {
 public:
     Component(GameObject* gameObject);
     virtual ~Component();
@@ -33,7 +66,7 @@ protected:
     virtual void AttachGameObject(GameObject* newGameObject);
     virtual std::unique_ptr<Component> Clone() const;
 
-    friend class GameObject;
+    friend class Object;
 };
 
 
@@ -47,31 +80,10 @@ public:
     bool isActiveAndEnabled;
     std::string* name;
 
-private:
     void AttachGameObject(GameObject* newGameObject) override;
     std::unique_ptr<Component> Clone() const override;
 
     friend class GameObject;
-};
-
-
-class Vector2D {
-public:
-    Vector2D() = default;
-    Vector2D(double x, double y);
-
-    double x{}, y{};
-
-	double GetMagnitude() const;
-    void Normalize();
-	void Scale(const int factor);
-
-    static const Vector2D up;
-    static const Vector2D down;
-    static const Vector2D left;
-    static const Vector2D right;
-    static const Vector2D one;
-    static const Vector2D zero;
 };
 
 class Transform final {
@@ -112,24 +124,16 @@ public:
     void SetParent(Transform& parentTransform);
     void SetParent(GameObject* parentGo);
 
-private:
     std::vector<Transform*> m_Children{};
 
     friend class GameObject;
+    friend class Object;
 };
 
-class Scene;
-
-class GameObject final {
+class GameObject final : public Object {
 public:
     GameObject(Scene* scene, const uint32_t id);
     GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
-
-    static GameObject* Instantiate(GameObject* gameObject);
-    static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
-    static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
-    static void Destroy(GameObject* gameObject);
-    static void DestroyImmediate(GameObject* gameObject);
     
     void Start();
     void Update();
@@ -280,7 +284,7 @@ public:
     // SHARED
     Scene* scene;
     uint32_t m_SceneInstanceID;
-private:
+
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
     
@@ -295,7 +299,7 @@ private:
     static void StartDownHeirarchy(GameObject* gameObject);
 };
 
-class Scene {
+class Scene : public Object {
 public:
     Scene();
     Scene(const std::string_view name);
@@ -306,12 +310,6 @@ public:
     void Update();
     void Render() const;
 
-    static GameObject* Instantiate(GameObject* gameObject);
-    static GameObject* Instantiate(GameObject* gameObject, Transform* parentTransform);
-    static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
-    static void Destroy(GameObject* gameObject);
-    static void DestroyImmediate(GameObject* gameObject);
-
     GameObject* CreateGameObject();
     GameObject* CreateGameObject(const std::string_view goName);
 
@@ -320,13 +318,13 @@ public:
 
     std::string name{};
 
-private:
     std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
     std::vector<GameObject*> m_StagedForDestruction{};
 
     uint32_t LatestSceneInstanceID{};
 
     friend class GameObject;
+    friend class Object;
 };
 
 // SOME COMPONENTS:

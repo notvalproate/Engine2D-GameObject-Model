@@ -3,6 +3,68 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 
+GameObject* Object::Instantiate(GameObject* gameObject) {
+    std::string newName = gameObject->name + " #" + std::to_string(gameObject->scene->LatestSceneInstanceID);
+    GameObject* newGameObject = gameObject->scene->CreateGameObject(newName);
+
+    for(auto& childTransform : gameObject->transform.m_Children) {
+        Instantiate(childTransform->gameObject, &newGameObject->transform);
+    }
+
+    for(auto& behaviour : gameObject->m_Behaviours) {
+        auto componentClone = behaviour.get()->Clone();
+        std::unique_ptr<Behaviour> behaviourCasted(static_cast<Behaviour*>(componentClone.release()));
+
+        behaviourCasted.get()->AttachGameObject(newGameObject);
+
+        newGameObject->m_Behaviours.push_back(std::move(behaviourCasted));
+    }
+
+    for(auto& component : gameObject->m_Components) {
+        auto componentClone = component.get()->Clone();
+
+        componentClone.get()->AttachGameObject(newGameObject);
+
+        newGameObject->m_Components.push_back(std::move(componentClone));
+    }
+
+    return newGameObject;
+}
+
+GameObject* Object::Instantiate(GameObject* gameObject, Transform* parentTransform) {
+    GameObject* newGameObject = Instantiate(gameObject);
+    newGameObject->transform.SetParent(parentTransform);
+
+    return newGameObject;
+}
+
+GameObject* Object::Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation) {
+    GameObject* newGameObject = Instantiate(gameObject);
+    newGameObject->transform.position = position;
+    newGameObject->transform.rotation = rotation;
+
+    return newGameObject;
+}
+
+void Object::Destroy(GameObject* gameObject) {
+    gameObject->scene->m_StagedForDestruction.push_back(gameObject);
+}
+
+void Object::DestroyImmediate(GameObject* gameObject) {
+    for(auto& childTransform : gameObject->transform.m_Children) {
+        DestroyImmediate(childTransform->gameObject);
+    }   
+
+    std::vector<std::unique_ptr<GameObject>>& SceneObjects = gameObject->scene->m_SceneGameObjects;
+
+    for (auto it = SceneObjects.begin(); it != SceneObjects.end(); ++it) {
+        if (it->get() == gameObject) {
+            SceneObjects.erase(it);
+            break;
+        }
+    }
+}
+
 Behaviour::Behaviour(GameObject* gameObject) : Component(gameObject), enabled(true), isActiveAndEnabled(true), name(&gameObject->name) { }
 
 void Behaviour::AttachGameObject(GameObject* newGameObject) {
@@ -13,34 +75,6 @@ void Behaviour::AttachGameObject(GameObject* newGameObject) {
 std::unique_ptr<Component> Behaviour::Clone() const {
     return std::make_unique<Behaviour>(*this);
 }
-
-Vector2D::Vector2D(double x, double y) : x(x), y(y) {}
-
-double Vector2D::GetMagnitude() const {
-    return std::sqrt(x * x + y * y);
-}
-
-void Vector2D::Normalize() {
-    if (x == 0 && y == 0) {
-		return;
-	}
-
-	double k = std::sqrt(x * x + y * y);
-	x /= k;
-	y /= k;
-}
-
-void Vector2D::Scale(const int factor) {
-    x *= factor;
-	y *= factor;
-}
-
-const Vector2D Vector2D::up(0.0, -1.0);
-const Vector2D Vector2D::down(0.0, 1.0);
-const Vector2D Vector2D::left(-1.0, 0.0);
-const Vector2D Vector2D::right(1.0, 0.0);
-const Vector2D Vector2D::one(1.0, 1.0);
-const Vector2D Vector2D::zero(0.0, 0.0);
 
 Transform::Transform(GameObject* gameObject) : gameObject(gameObject), parent(nullptr), tag(&gameObject->tag), name(&gameObject->name) { };
 
@@ -197,67 +231,6 @@ GameObject::GameObject(Scene* scene, const uint32_t id) : name({}), tag({}), tra
 
 GameObject::GameObject(const std::string_view goName, Scene* scene, const uint32_t id) : name(goName), tag({}), transform(this), scene(scene), m_SceneInstanceID(id) { }
 
-GameObject* GameObject::Instantiate(GameObject* gameObject) {
-    std::string newName = gameObject->name + " #" + std::to_string(gameObject->scene->LatestSceneInstanceID);
-    GameObject* newGameObject = gameObject->scene->CreateGameObject(newName);
-
-    for(auto& childTransform : gameObject->transform.m_Children) {
-        Instantiate(childTransform->gameObject, &newGameObject->transform);
-    }
-
-    for(auto& behaviour : gameObject->m_Behaviours) {
-        auto componentClone = behaviour.get()->Clone();
-        std::unique_ptr<Behaviour> behaviourCasted(static_cast<Behaviour*>(componentClone.release()));
-
-        behaviourCasted.get()->AttachGameObject(newGameObject);
-
-        newGameObject->m_Behaviours.push_back(std::move(behaviourCasted));
-    }
-
-    for(auto& component : gameObject->m_Components) {
-        auto componentClone = component.get()->Clone();
-
-        componentClone.get()->AttachGameObject(newGameObject);
-
-        newGameObject->m_Components.push_back(std::move(componentClone));
-    }
-
-    return newGameObject;
-}
-
-GameObject* GameObject::Instantiate(GameObject* gameObject, Transform* parentTransform) {
-    GameObject* newGameObject = Instantiate(gameObject);
-    newGameObject->transform.SetParent(parentTransform);
-
-    return newGameObject;
-}
-
-GameObject* GameObject::Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation) {
-    GameObject* newGameObject = Instantiate(gameObject);
-    newGameObject->transform.position = position;
-    newGameObject->transform.rotation = rotation;
-
-    return newGameObject;
-}
-
-void GameObject::Destroy(GameObject* gameObject) {
-    gameObject->scene->m_StagedForDestruction.push_back(gameObject);
-}
-
-void GameObject::DestroyImmediate(GameObject* gameObject) {
-    for(auto& childTransform : gameObject->transform.m_Children) {
-        DestroyImmediate(childTransform->gameObject);
-    }   
-
-    std::vector<std::unique_ptr<GameObject>>& SceneObjects = gameObject->scene->m_SceneGameObjects;
-
-    for (auto it = SceneObjects.begin(); it != SceneObjects.end(); ++it) {
-        if (it->get() == gameObject) {
-            SceneObjects.erase(it);
-            break;
-        }
-    }
-}
 
 void GameObject::Start() {
     for (auto& behaviour : m_Behaviours) {
@@ -285,13 +258,13 @@ void GameObject::Render() const {
     }
 }
 
-void GameObject::StartDownHeirarchy(GameObject* gameObject) {
-    gameObject->Start();
+// void GameObject::StartDownHeirarchy(GameObject* gameObject) {
+//     gameObject->Start();
 
-    for(auto& childTransform : gameObject->transform.m_Children) {
-        childTransform->gameObject->Start();
-    }
-}
+//     for(auto& childTransform : gameObject->transform.m_Children) {
+//         childTransform->gameObject->Start();
+//     }
+// }
 
 Scene::Scene() { }
 
@@ -352,24 +325,4 @@ std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTa
     }
 
     return objects;
-}
-
-GameObject* Scene::Instantiate(GameObject* gameObject) {
-    return GameObject::Instantiate(gameObject);
-}
-
-GameObject* Scene::Instantiate(GameObject* gameObject, Transform* parentTransform) {
-    return GameObject::Instantiate(gameObject, parentTransform);
-}
-
-GameObject* Scene::Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation) {
-    return GameObject::Instantiate(gameObject, position, rotation);
-}
-
-void Scene::Destroy(GameObject* gameObject) {
-    GameObject::Destroy(gameObject);
-}
-
-void Scene::DestroyImmediate(GameObject* gameObject) {
-    GameObject::DestroyImmediate(gameObject);
 }
