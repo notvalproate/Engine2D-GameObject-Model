@@ -6,8 +6,6 @@
 #include <string>
 #include <string_view>
 #include <memory>
-#include <optional>
-#include <typeinfo>
 #include <algorithm>
 #include <functional>
 
