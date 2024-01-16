@@ -1,20 +1,21 @@
 CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -O3
 BUILD_DIR := build
-TARGET := main
-SRCS := main.cpp Component.cpp Vector2D.cpp Object.cpp Behaviour.cpp Transform.cpp GameObject.cpp Scene.cpp
-OBJS := $(addprefix $(BUILD_DIR)/,$(SRCS:.cpp=.o))
+SRC_DIR := src
+SRCS := $(wildcard $(SRC_DIR)/*.cpp)
+OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
+EXECUTABLE := $(BUILD_DIR)/main
 
-all: $(BUILD_DIR)/$(TARGET)
+all: $(BUILD_DIR) $(EXECUTABLE)
 
 $(BUILD_DIR):
-	mkdir -p $@
+	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: %.cpp | build
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(EXECUTABLE): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^
 
-$(BUILD_DIR)/$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) $^ -o $@
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 ifeq ($(OS),Windows_NT)
     CLEAN_COMMAND := del /Q /S
