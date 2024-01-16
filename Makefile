@@ -2,7 +2,7 @@ CXX := g++
 CXXFLAGS := -std=c++17 -Wall -Wextra -pedantic -O3
 BUILD_DIR := build
 TARGET := main
-SRCS := main.cpp Core.cpp Component.cpp
+SRCS := main.cpp Component.cpp Vector2D.cpp Object.cpp Behaviour.cpp Transform.cpp GameObject.cpp Scene.cpp
 OBJS := $(addprefix $(BUILD_DIR)/,$(SRCS:.cpp=.o))
 
 all: $(BUILD_DIR)/$(TARGET)
