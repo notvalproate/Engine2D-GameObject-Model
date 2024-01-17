@@ -32,23 +32,8 @@ void GameObject::Render() const {
     }
 }
 
-std::size_t GameObject::GetComponentIndex(Component* component, bool& isBehaviour) {
-    isBehaviour = true;
-
-    if(dynamic_cast<Behaviour*>(component) == nullptr) {
-        isBehaviour = false;
-    }
-
+std::size_t GameObject::GetComponentIndex(Component* component) {
     std::size_t i = 0;
-
-    if(isBehaviour) {
-        for(const auto& behaviour : m_Behaviours) {
-            if(component == behaviour.get()) {
-                return i;
-            }
-            i++;
-        }
-    }
 
     for(const auto& comp : m_Components) {
         if(component == comp.get()) {
@@ -58,4 +43,33 @@ std::size_t GameObject::GetComponentIndex(Component* component, bool& isBehaviou
     }
 
     return i;
+}
+
+std::size_t GameObject::GetBehaviourIndex(Behaviour* behaviour) {
+    std::size_t i = 0;
+
+    for(const auto& comp : m_Components) {
+        if(behaviour == comp.get()) {
+            return i;
+        }
+        i++;
+    }
+
+    return i;
+}
+
+Component* GameObject::GetComponentByIndex(const std::size_t index) {
+    if(index < 0 || index >= m_Components.size()) {
+        return nullptr;
+    }
+
+    return m_Components[index].get();
+}
+
+Behaviour* GameObject::GetBehaviourByIndex(const std::size_t index) {
+    if(index < 0 || index >= m_Behaviours.size()) {
+        return nullptr;
+    }
+
+    return m_Behaviours[index].get();
 }

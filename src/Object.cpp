@@ -63,15 +63,21 @@ void Object::DestroyImmediate(GameObject* gameObject) {
 }
 
 Behaviour* Object::Instantiate(Behaviour* behaviour) {
+    std::size_t index = behaviour->gameObject->GetBehaviourIndex(behaviour);
     GameObject* newGameObject = Instantiate(behaviour->gameObject);
+    return newGameObject->GetBehaviourByIndex(index);
 }
 
 Behaviour* Object::Instantiate(Behaviour* behaviour, Transform* parentTransform) {
+    std::size_t index = behaviour->gameObject->GetBehaviourIndex(behaviour);
     GameObject* newGameObject = Instantiate(behaviour->gameObject, parentTransform);
+    return newGameObject->GetBehaviourByIndex(index);
 }
 
 Behaviour* Object::Instantiate(Behaviour* behaviour, const Vector2D& position, const double rotation) {
+    std::size_t index = behaviour->gameObject->GetBehaviourIndex(behaviour);
     GameObject* newGameObject = Instantiate(behaviour->gameObject, position, rotation);
+    return newGameObject->GetBehaviourByIndex(index);
 }
 
 void Object::Destroy(Behaviour* behaviour) {
@@ -80,4 +86,30 @@ void Object::Destroy(Behaviour* behaviour) {
 
 void Object::DestroyImmediate(Behaviour* behaviour) {
     
+}
+
+Component* Object::Instantiate(Component* component) {
+    std::size_t index = component->gameObject->GetComponentIndex(component);
+    GameObject* newGameObject = Instantiate(component->gameObject);
+    return newGameObject->GetComponentByIndex(index);
+}
+
+Component* Object::Instantiate(Component* component, Transform* parentTransform) {
+    std::size_t index = component->gameObject->GetComponentIndex(component);
+    GameObject* newGameObject = Instantiate(component->gameObject, parentTransform);
+    return newGameObject->GetComponentByIndex(index);
+}
+
+Component* Object::Instantiate(Component* component, const Vector2D& position, const double rotation) {
+    std::size_t index = component->gameObject->GetComponentIndex(component);
+    GameObject* newGameObject = Instantiate(component->gameObject, position, rotation);
+    return newGameObject->GetComponentByIndex(index);
+}
+
+void Object::Destroy(Component* component) {
+
+}
+
+void Object::DestroyImmediate(Component* component) {
+
 }

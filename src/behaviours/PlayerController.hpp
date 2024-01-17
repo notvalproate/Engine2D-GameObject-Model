@@ -14,9 +14,6 @@ public:
 
     void Start() override {
         playerScript = gameObject->GetComponent<Player>();
-
-        bool isBehaviour = false;
-        std::cout << "The player controller component index is: " << gameObject->GetComponentIndex(playerScript, isBehaviour) << (isBehaviour ? " It is behaviour" : " It is component") << std::endl;
     }
 
     void Update() override {

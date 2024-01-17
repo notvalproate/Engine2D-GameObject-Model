@@ -31,6 +31,12 @@ public:
     static Behaviour* Instantiate(Behaviour* behaviour, const Vector2D& position, const double rotation);
     static void Destroy(Behaviour* behaviour);
     static void DestroyImmediate(Behaviour* behaviour);
+
+    static Component* Instantiate(Component* component);
+    static Component* Instantiate(Component* component, Transform* parentTransform);
+    static Component* Instantiate(Component* component, const Vector2D& position, const double rotation);
+    static void Destroy(Component* component);
+    static void DestroyImmediate(Component* component);
 };
 
 class Vector2D {
@@ -302,7 +308,10 @@ public:
         );
     }
 
-    std::size_t GetComponentIndex(Component* component, bool& isBehaviour);
+    std::size_t GetComponentIndex(Component* component);
+    std::size_t GetBehaviourIndex(Behaviour* behaviour);
+    Component* GetComponentByIndex(const std::size_t index);
+    Behaviour* GetBehaviourByIndex(const std::size_t index);
 };
 
 class Scene : public Object {
