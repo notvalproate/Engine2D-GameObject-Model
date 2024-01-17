@@ -39,6 +39,7 @@ public:
     static void DestroyImmediate(Component* component);
 };
 
+
 class Vector2D {
 public:
     Vector2D() = default;
@@ -58,9 +59,9 @@ public:
     static const Vector2D zero;
 };
 
+
 class Component : public Object {
 public:
-    Component(GameObject* gameObject);
     virtual ~Component();
 
     virtual void Awake() {};
@@ -69,16 +70,21 @@ public:
     virtual void Render() const {};
 
     bool CompareTag(const std::string_view otherTag) const;
+    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
+    GameObject* FindObjectByName(const std::string_view searchName);
 
     GameObject* gameObject;
     Transform* transform;
     std::string* tag;
 
-protected:
+private:
+    Component(GameObject* gameObject);
+
     virtual void AttachGameObject(GameObject* newGameObject);
     virtual std::unique_ptr<Component> Clone() const;
 
     friend class Object;
+    friend class Behaviour;
 };
 
 
@@ -92,7 +98,7 @@ public:
     bool isActiveAndEnabled;
     std::string* name;
 
-    void AttachGameObject(GameObject* newGameObject) override;
+    void AttachGameObject(GameObject* newGameObject) override final;
     std::unique_ptr<Component> Clone() const override;
 
     friend class GameObject;

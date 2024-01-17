@@ -14,6 +14,11 @@ public:
 
     void Start() override {
         playerScript = gameObject->GetComponent<Player>();
+        std::cout << "Finding other player" << std::endl;
+        otherPlayer = FindObjectByName("Player #3");
+        if(otherPlayer) {
+            std::cout << "Found other player!! " << otherPlayer->name << std::endl;
+        }
     }
 
     void Update() override {
@@ -26,4 +31,5 @@ public:
 
     Player* playerScript;
     Transform* playerTransform;
+    GameObject* otherPlayer;
 };
