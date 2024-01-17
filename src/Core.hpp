@@ -25,6 +25,12 @@ public:
     static GameObject* Instantiate(GameObject* gameObject, const Vector2D& position, const double rotation);
     static void Destroy(GameObject* gameObject);
     static void DestroyImmediate(GameObject* gameObject);
+    
+    static Behaviour* Instantiate(Behaviour* behaviour);
+    static Behaviour* Instantiate(Behaviour* behaviour, Transform* parentTransform);
+    static Behaviour* Instantiate(Behaviour* behaviour, const Vector2D& position, const double rotation);
+    static void Destroy(Behaviour* behaviour);
+    static void DestroyImmediate(Behaviour* behaviour);
 };
 
 class Vector2D {
@@ -296,7 +302,7 @@ public:
         );
     }
 
-    static void StartDownHeirarchy(GameObject* gameObject);
+    std::size_t GetComponentIndex(Component* component, bool& isBehaviour);
 };
 
 class Scene : public Object {
@@ -326,5 +332,3 @@ public:
     friend class GameObject;
     friend class Object;
 };
-
-// SOME COMPONENTS:

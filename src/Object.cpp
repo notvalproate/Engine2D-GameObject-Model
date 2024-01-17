@@ -61,3 +61,23 @@ void Object::DestroyImmediate(GameObject* gameObject) {
         }
     }
 }
+
+Behaviour* Object::Instantiate(Behaviour* behaviour) {
+    GameObject* newGameObject = Instantiate(behaviour->gameObject);
+}
+
+Behaviour* Object::Instantiate(Behaviour* behaviour, Transform* parentTransform) {
+    GameObject* newGameObject = Instantiate(behaviour->gameObject, parentTransform);
+}
+
+Behaviour* Object::Instantiate(Behaviour* behaviour, const Vector2D& position, const double rotation) {
+    GameObject* newGameObject = Instantiate(behaviour->gameObject, position, rotation);
+}
+
+void Object::Destroy(Behaviour* behaviour) {
+
+}
+
+void Object::DestroyImmediate(Behaviour* behaviour) {
+    
+}
