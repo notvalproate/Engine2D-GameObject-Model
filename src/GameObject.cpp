@@ -24,6 +24,20 @@ void GameObject::Update() {
     for(auto& component : m_Components) {
         component->Update();
     }
+
+    if(m_BehavioursStagedForDestruction.size()) {
+        for(auto& behaviour : m_BehavioursStagedForDestruction) {
+            RemoveBehaviour(behaviour);
+        }
+        m_BehavioursStagedForDestruction.clear();
+    }
+
+    if(m_ComponentsStagedForDestruction.size()) {
+        for(auto& component : m_ComponentsStagedForDestruction) {
+            RemoveComponent(component);
+        }
+        m_ComponentsStagedForDestruction.clear();
+    }
 }
 
 void GameObject::Render() const {
@@ -59,7 +73,7 @@ std::size_t GameObject::GetBehaviourIndex(Behaviour* behaviour) {
 }
 
 Component* GameObject::GetComponentByIndex(const std::size_t index) {
-    if(index < 0 || index >= m_Components.size()) {
+    if(index >= m_Components.size()) {
         return nullptr;
     }
 
@@ -67,9 +81,20 @@ Component* GameObject::GetComponentByIndex(const std::size_t index) {
 }
 
 Behaviour* GameObject::GetBehaviourByIndex(const std::size_t index) {
-    if(index < 0 || index >= m_Behaviours.size()) {
+    if(index >= m_Behaviours.size()) {
         return nullptr;
     }
 
     return m_Behaviours[index].get();
+}
+
+
+void GameObject::RemoveComponent(Component* component) {
+    std::size_t index = GetComponentIndex(component);
+    m_Components.erase(m_Components.begin() + index);
+}
+
+void GameObject::RemoveBehaviour(Behaviour* behaviour) {
+    std::size_t index = GetBehaviourIndex(behaviour);
+    m_Behaviours.erase(m_Behaviours.begin() + index);
 }

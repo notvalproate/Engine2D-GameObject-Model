@@ -81,11 +81,11 @@ Behaviour* Object::Instantiate(Behaviour* behaviour, const Vector2D& position, c
 }
 
 void Object::Destroy(Behaviour* behaviour) {
-
+    behaviour->gameObject->m_BehavioursStagedForDestruction.push_back(behaviour);
 }
 
 void Object::DestroyImmediate(Behaviour* behaviour) {
-    
+    behaviour->gameObject->RemoveBehaviour(behaviour);
 }
 
 Component* Object::Instantiate(Component* component) {
@@ -107,9 +107,9 @@ Component* Object::Instantiate(Component* component, const Vector2D& position, c
 }
 
 void Object::Destroy(Component* component) {
-
+    component->gameObject->m_ComponentsStagedForDestruction.push_back(component);
 }
 
 void Object::DestroyImmediate(Component* component) {
-
+    component->gameObject->RemoveComponent(component);
 }

@@ -299,6 +299,8 @@ public:
 
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
+    std::vector<Component*> m_ComponentsStagedForDestruction{};
+    std::vector<Behaviour*> m_BehavioursStagedForDestruction{};
     
     template<typename... Args>
     static void AssertParametersAreDerived() {
@@ -312,6 +314,8 @@ public:
     std::size_t GetBehaviourIndex(Behaviour* behaviour);
     Component* GetComponentByIndex(const std::size_t index);
     Behaviour* GetBehaviourByIndex(const std::size_t index);
+    void RemoveComponent(Component* component);
+    void RemoveBehaviour(Behaviour* behaviour);
 };
 
 class Scene : public Object {
