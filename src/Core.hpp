@@ -62,6 +62,7 @@ public:
 
 class Component : public Object {
 public:
+    Component(GameObject* gameObject);
     virtual ~Component();
 
     virtual void Awake() {};
@@ -77,13 +78,13 @@ public:
     Transform* transform;
     std::string* tag;
 
-private:
-    Component(GameObject* gameObject);
+protected:
 
     virtual void AttachGameObject(GameObject* newGameObject);
     virtual std::unique_ptr<Component> Clone() const;
 
     friend class Object;
+    friend class GameObject;
     friend class Behaviour;
 };
 
@@ -91,16 +92,19 @@ private:
 class Behaviour : public Component {
 public:
     Behaviour(GameObject* gameObject);
-
+    
     void Render() const override final { };
 
     bool enabled;
     bool isActiveAndEnabled;
     std::string* name;
 
+private:
+
     void AttachGameObject(GameObject* newGameObject) override final;
     std::unique_ptr<Component> Clone() const override;
 
+    friend class Object;
     friend class GameObject;
 };
 

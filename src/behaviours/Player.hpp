@@ -43,7 +43,7 @@ public:
         std::cout << *name << " health reduced to " <<  health << std::endl;
         if(health == 0) {
             Death();
-            GameObject::Destroy(gameObject);
+            Destroy(gameObject);
         }
     }
 
