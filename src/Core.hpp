@@ -64,11 +64,6 @@ class Component : public Object {
 public:
     virtual ~Component();
 
-    virtual void Awake() {};
-    virtual void Start() {};
-    virtual void Update() {};
-    virtual void Render() const {};
-
     bool CompareTag(const std::string_view otherTag) const;
     std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag) const;
     GameObject* FindObjectByName(const std::string_view searchName) const;
@@ -79,6 +74,11 @@ public:
 
 private:
     Component(GameObject* gameObject);
+
+    virtual void Awake() {};
+    virtual void Start() {};
+    virtual void Update() {};
+    virtual void Render() const {};
 
     virtual void AttachGameObject(GameObject* newGameObject);
     virtual std::unique_ptr<Component> Clone() const;
@@ -91,14 +91,14 @@ private:
 
 class Behaviour : public Component {
 public:
-    void Render() const override final { };
-
     bool enabled;
     bool isActiveAndEnabled;
     std::string* name;
 
 private:
     Behaviour(GameObject* gameObject);
+
+    void Render() const override final { };
 
     void AttachGameObject(GameObject* newGameObject) override final;
     std::unique_ptr<Component> Clone() const override;
@@ -156,10 +156,6 @@ private:
 
 class GameObject final : public Object {
 public:
-    void Start();
-    void Update();
-    void Render() const;
-
     template<typename T>
     T* AddComponent() {
         AssertParametersAreDerived<T>();
@@ -307,9 +303,9 @@ private:
     GameObject(Scene* scene, const uint32_t id);
     GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
-    std::vector<std::unique_ptr<Component>> m_Components{};
-    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
-    std::vector<Component*> m_ComponentsStagedForDestruction{};
+    void Start();
+    void Update();
+    void Render() const;
     std::vector<Behaviour*> m_BehavioursStagedForDestruction{};
 
     std::size_t GetComponentIndex(Component* component);
@@ -326,6 +322,10 @@ private:
             "Custom Component provided not derived from Component Class"
         );
     }
+
+    std::vector<std::unique_ptr<Component>> m_Components{};
+    std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
+    std::vector<Component*> m_ComponentsStagedForDestruction{};
 
     friend class Object;
     friend class Scene;
@@ -350,11 +350,11 @@ public:
 
     std::string name{};
 
+private:
     std::vector<std::unique_ptr<GameObject>> m_SceneGameObjects{};
     std::vector<GameObject*> m_StagedForDestruction{};
 
     uint32_t LatestSceneInstanceID{};
 
-    friend class GameObject;
     friend class Object;
 };
