@@ -30,12 +30,12 @@ void Scene::Render() const {
 }
 
 GameObject* Scene::CreateGameObject() {
-    m_SceneGameObjects.push_back(std::make_unique<GameObject>(this, LatestSceneInstanceID++));
+    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(this, LatestSceneInstanceID++)));
     return m_SceneGameObjects.back().get();
 }
 
 GameObject* Scene::CreateGameObject(const std::string_view goName) {
-    m_SceneGameObjects.push_back(std::make_unique<GameObject>(goName, this, LatestSceneInstanceID++));
+    m_SceneGameObjects.push_back(std::unique_ptr<GameObject>(new GameObject(goName, this, LatestSceneInstanceID++)));
     return m_SceneGameObjects.back().get();
 }
 

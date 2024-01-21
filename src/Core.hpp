@@ -110,7 +110,7 @@ private:
 class Transform final {
 public:
     Transform(GameObject* gameObject);
-    
+
     //CHECK WHAT THIS SHOULD BE DOING LATER
     ~Transform();
 
@@ -156,9 +156,6 @@ private:
 
 class GameObject final : public Object {
 public:
-    GameObject(Scene* scene, const uint32_t id);
-    GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
-    
     void Start();
     void Update();
     void Render() const;
@@ -300,20 +297,28 @@ public:
         return components;
     }
 
-    // OWNED
     std::string name;
     std::string tag;
     Transform transform;
 
-    // SHARED
     Scene* scene;
     uint32_t m_SceneInstanceID;
+private:
+    GameObject(Scene* scene, const uint32_t id);
+    GameObject(const std::string_view goName, Scene* scene, const uint32_t id);
 
     std::vector<std::unique_ptr<Component>> m_Components{};
     std::vector<std::unique_ptr<Behaviour>> m_Behaviours{};
     std::vector<Component*> m_ComponentsStagedForDestruction{};
     std::vector<Behaviour*> m_BehavioursStagedForDestruction{};
-    
+
+    std::size_t GetComponentIndex(Component* component);
+    std::size_t GetBehaviourIndex(Behaviour* behaviour);
+    Component* GetComponentByIndex(const std::size_t index);
+    Behaviour* GetBehaviourByIndex(const std::size_t index);
+    void RemoveComponent(Component* component);
+    void RemoveBehaviour(Behaviour* behaviour);
+
     template<typename... Args>
     static void AssertParametersAreDerived() {
         static_assert(
@@ -322,12 +327,8 @@ public:
         );
     }
 
-    std::size_t GetComponentIndex(Component* component);
-    std::size_t GetBehaviourIndex(Behaviour* behaviour);
-    Component* GetComponentByIndex(const std::size_t index);
-    Behaviour* GetBehaviourByIndex(const std::size_t index);
-    void RemoveComponent(Component* component);
-    void RemoveBehaviour(Behaviour* behaviour);
+    friend class Object;
+    friend class Scene;
 };
 
 class Scene : public Object {
