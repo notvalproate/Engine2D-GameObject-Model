@@ -62,7 +62,6 @@ public:
 
 class Component : public Object {
 public:
-    Component(GameObject* gameObject);
     virtual ~Component();
 
     virtual void Awake() {};
@@ -71,14 +70,15 @@ public:
     virtual void Render() const {};
 
     bool CompareTag(const std::string_view otherTag) const;
-    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
-    GameObject* FindObjectByName(const std::string_view searchName);
+    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag) const;
+    GameObject* FindObjectByName(const std::string_view searchName) const;
 
     GameObject* gameObject;
     Transform* transform;
     std::string* tag;
 
-protected:
+private:
+    Component(GameObject* gameObject);
 
     virtual void AttachGameObject(GameObject* newGameObject);
     virtual std::unique_ptr<Component> Clone() const;
@@ -91,8 +91,6 @@ protected:
 
 class Behaviour : public Component {
 public:
-    Behaviour(GameObject* gameObject);
-    
     void Render() const override final { };
 
     bool enabled;
@@ -100,6 +98,7 @@ public:
     std::string* name;
 
 private:
+    Behaviour(GameObject* gameObject);
 
     void AttachGameObject(GameObject* newGameObject) override final;
     std::unique_ptr<Component> Clone() const override;
@@ -166,12 +165,12 @@ public:
         AssertParametersAreDerived<T>();
 
         if constexpr (std::is_base_of<Behaviour, T>::value) {
-            m_Behaviours.push_back(std::make_unique<T>(this));
+            m_Behaviours.push_back(std::unique_ptr<T>(new T(this)));
             m_Behaviours.back().get()->Awake();
             return static_cast<T*>(m_Behaviours.back().get());
         }
 
-        m_Components.push_back(std::make_unique<T>(this));
+        m_Components.push_back(std::unique_ptr<T>(new T(this)));
         m_Components.back().get()->Awake();
         m_Components.back().get();
     }

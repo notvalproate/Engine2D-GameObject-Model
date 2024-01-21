@@ -8,11 +8,11 @@ bool Component::CompareTag(const std::string_view otherTag) const {
     return *tag == otherTag;
 }
 
-std::vector<GameObject*> Component::FindObjectsByTag(const std::string_view searchTag) {
+std::vector<GameObject*> Component::FindObjectsByTag(const std::string_view searchTag) const {
     return gameObject->scene->FindObjectsByTag(searchTag);
 }
 
-GameObject* Component::FindObjectByName(const std::string_view searchName) {
+GameObject* Component::FindObjectByName(const std::string_view searchName) const {
     return gameObject->scene->FindObjectByName(searchName);
 }
 
