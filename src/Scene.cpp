@@ -39,7 +39,7 @@ GameObject* Scene::CreateGameObject(const std::string_view goName) {
     return m_SceneGameObjects.back().get();
 }
 
-GameObject* Scene::FindObjectByName(const std::string_view searchName) {
+GameObject* Scene::FindObjectByName(const std::string_view searchName) const {
     for(auto& object : m_SceneGameObjects) {
         if(object.get()->name == searchName) {
             return object.get();
@@ -49,7 +49,7 @@ GameObject* Scene::FindObjectByName(const std::string_view searchName) {
     return nullptr;
 }
 
-std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTag) {
+std::vector<GameObject*> Scene::FindObjectsByTag(const std::string_view searchTag) const {
     std::vector<GameObject*> objects{};
     
     for(auto& object : m_SceneGameObjects) {

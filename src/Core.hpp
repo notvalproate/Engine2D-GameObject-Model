@@ -110,6 +110,8 @@ private:
 class Transform final {
 public:
     Transform(GameObject* gameObject);
+    
+    //CHECK WHAT THIS SHOULD BE DOING LATER
     ~Transform();
 
     Vector2D position{};
@@ -145,6 +147,7 @@ public:
     void SetParent(Transform& parentTransform);
     void SetParent(GameObject* parentGo);
 
+private:
     std::vector<Transform*> m_Children{};
 
     friend class GameObject;
@@ -341,8 +344,8 @@ public:
     GameObject* CreateGameObject();
     GameObject* CreateGameObject(const std::string_view goName);
 
-    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag);
-    GameObject* FindObjectByName(const std::string_view searchName);
+    std::vector<GameObject*> FindObjectsByTag(const std::string_view searchTag) const;
+    GameObject* FindObjectByName(const std::string_view searchName) const;
 
     std::string name{};
 

@@ -20,7 +20,7 @@ void Transform::Rotate(const double angle) {
     rotation += angle;
 
     for(auto& child : m_Children) {
-        child->Rotate(angle);
+        child->RotateAround(position, angle);
     }
 }
 
