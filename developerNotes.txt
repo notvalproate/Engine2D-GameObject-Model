@@ -1,4 +1,5 @@
 {
-    [2024-01-14 ; 13:18]
-    - Make Destroy methods for Component class that remove the component from the gameobject.
+    [2024-01-23 ; 23:34]
+    - Import this into the Engine2D Project on a new branch.
+    - Create a new Engine2D class and copy over sdl code from previous one.
 }
